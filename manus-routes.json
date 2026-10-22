@@ -1,0 +1,11 @@
+{
+  "routes": [
+    { "path": "/", "title": "Home" },
+    { "path": "/projects", "title": "Projects" },
+    { "path": "/projects/:slug", "title": "Project Detail" },
+    { "path": "/about", "title": "About" },
+    { "path": "/services", "title": "Services" },
+    { "path": "/cv", "title": "CV" },
+    { "path": "/contact", "title": "Contact" }
+  ]
+}
