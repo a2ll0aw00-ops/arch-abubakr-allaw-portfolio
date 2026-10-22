@@ -1,0 +1,155 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy: #081728;
+  --color-navy-light: #0f2a45;
+  --color-bronze: #C7A66A;
+  --color-bronze-light: #d4b87e;
+  --color-bronze-dark: #a8894f;
+  --color-offwhite: #F4F0E8;
+  --color-cream: #FAF8F4;
+  --font-sans: 'Montserrat', sans-serif;
+  --font-arabic: 'Noto Kufi Arabic', sans-serif;
+}
+
+/* Base Styles */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  color: #081728;
+  background-color: #FFFFFF;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Optional dark theme: remaps light surfaces and navy text without changing
+   the existing layout, imagery, or brand colors. */
+html[data-theme="dark"] body {
+  color-scheme: dark;
+  background-color: #081728;
+  color: #F4F0E8;
+}
+
+html[data-theme="dark"] [class*="bg-white"],
+html[data-theme="dark"] [class*="bg-offwhite"],
+html[data-theme="dark"] [class*="bg-cream"] {
+  background-color: #10253A !important;
+}
+
+html[data-theme="dark"] [class*="text-navy"] {
+  color: #F4F0E8 !important;
+}
+
+html[data-theme="dark"] [class*="border-navy"] {
+  border-color: rgba(244, 240, 232, 0.18) !important;
+}
+
+html[data-theme="dark"] [class*="bg-bronze"][class*="text-navy"] {
+  color: #081728 !important;
+}
+
+html[data-theme="dark"] .img-loading {
+  background: linear-gradient(135deg, #10253A 0%, #16314A 100%);
+}
+
+html[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: #10253A;
+}
+
+/* RTL Arabic font */
+html[dir="rtl"] body {
+  font-family: 'Noto Kufi Arabic', 'Montserrat', sans-serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F4F0E8;
+}
+::-webkit-scrollbar-thumb {
+  background: #C7A66A;
+  border-radius: 3px;
+}
+
+/* Selection */
+::selection {
+  background-color: #C7A66A;
+  color: #081728;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  html { scroll-behavior: auto; }
+  
+  /* Disable parallax and complex animations */
+  [style*="transform"] {
+    transform: none !important;
+  }
+}
+
+/* Focus visible for accessibility */
+*:focus-visible {
+  outline: 2px solid #C7A66A;
+  outline-offset: 2px;
+}
+
+/* Skip to content link */
+.skip-to-content {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #081728;
+  color: #C7A66A;
+  padding: 8px;
+  text-decoration: none;
+  z-index: 100;
+}
+
+.skip-to-content:focus {
+  top: 0;
+}
+
+/* Keep lazy-loaded images visible; the browser still defers off-screen requests. */
+img {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+/* Image loading */
+.img-loading {
+  background: linear-gradient(135deg, #F4F0E8 0%, #e8e2d6 100%);
+}
+
+/* Progress bar */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #C7A66A, #d4b87e);
+  z-index: 9999;
+  transition: width 0.1s linear;
+}
+
+html[dir="rtl"] .scroll-progress {
+  left: auto;
+  right: 0;
+}
+
+/* Print styles */
+@media print {
+  .no-print { display: none !important; }
+  body { font-size: 11pt; }
+  section { break-inside: avoid; }
+}
