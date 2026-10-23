@@ -1,15 +1,21 @@
 import type {StructureBuilder} from 'sanity/structure';
 
-const pageTextList = (S: StructureBuilder, title: string, pages: string[]) =>
-  S.listItem()
+const pageTextList = (S: StructureBuilder, title: string, pages: string[]) => {
+  const pageFilter = JSON.stringify(pages);
+  return S.listItem()
     .title(title)
     .child(
       S.documentTypeList('siteCopy')
-        .title(title)
-        .filter('_type == "siteCopy" && count(entries[page in $pages]) > 0')
-        .params({pages})
-        .defaultOrdering([{field: 'order', direction: 'asc'}]),
+        .title(`${title} — مجموعات النصوص`)
+        .filter(`_type == "siteCopy" && count(entries[page in ${pageFilter}]) > 0`),
     );
+};
+
+const siteSettingsDocument = (S: StructureBuilder, title: string) =>
+  S.document()
+    .schemaType('siteSettings')
+    .documentId('site-settings-main')
+    .title(title);
 
 export const structure = (S: StructureBuilder) =>
   S.list()
@@ -17,7 +23,10 @@ export const structure = (S: StructureBuilder) =>
     .items([
       S.listItem()
         .title('إعدادات الموقع والهوية')
-        .child(S.documentTypeList('siteSettings').title('إعدادات الموقع')),
+        .child(siteSettingsDocument(S, 'إعدادات الموقع والهوية — الاسم والتواصل والصورة الشخصية')),
+      S.listItem()
+        .title('الشعار والصورة الشخصية')
+        .child(siteSettingsDocument(S, 'الشعار والصورة الشخصية — صفحة عن المهندس')),
       S.divider(),
       S.listItem()
         .title('النصوص حسب الصفحة')
@@ -33,7 +42,7 @@ export const structure = (S: StructureBuilder) =>
               pageTextList(S, 'التواصل', ['contact', 'contactPage']),
               pageTextList(S, 'التذييل والتنقل', ['nav', 'footer', 'lang', 'whatsapp']),
               S.divider(),
-              S.documentTypeListItem('siteCopy').title('كل النصوص'),
+              S.documentTypeListItem('siteCopy').title('كل مجموعات النصوص'),
             ]),
         ),
       S.divider(),
@@ -54,7 +63,7 @@ export const structure = (S: StructureBuilder) =>
             .items([
               S.documentTypeListItem('project').title('صور المشاريع'),
               S.documentTypeListItem('service').title('صور الخدمات'),
-              S.documentTypeListItem('siteSettings').title('الشعار وصورة المشاركة'),
+              S.documentTypeListItem('siteSettings').title('الشعار والصورة الشخصية'),
             ]),
         ),
     ]);

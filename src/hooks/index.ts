@@ -178,7 +178,9 @@ export function useSocialLinks() {
       _id: item._key || `${item.platform}-${item.url}`,
       platform: item.label || String(item.platform || 'Other').replace(/^./, (letter) => letter.toUpperCase()),
       icon: String(item.platform || 'website').toLowerCase(),
-      url: item.url,
+      url: String(item.url).trim().startsWith('http://') || String(item.url).trim().startsWith('https://')
+        ? String(item.url).trim()
+        : `https://${String(item.url).trim()}`,
       visible: true,
     }))
     : [];

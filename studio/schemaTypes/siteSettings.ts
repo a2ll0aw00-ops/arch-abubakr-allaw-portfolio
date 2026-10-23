@@ -65,7 +65,23 @@ export const siteSettings = defineType({
           validation: (rule) => rule.required(),
         }),
         defineField({name: 'label', title: 'الاسم الظاهر اختيارياً', type: 'string', description: 'يظهر كاسم الحساب في التلميح. يمكن تركه فارغاً.'}),
-        defineField({name: 'url', title: 'رابط الحساب', type: 'url', description: 'الصق الرابط الكامل لحسابك، مثل https://instagram.com/username', validation: (rule) => rule.required()}),
+        defineField({
+          name: 'url',
+          title: 'رابط الحساب',
+          type: 'string',
+          description: 'الصق الرابط كاملاً مثل https://instagram.com/username أو instagram.com/username. سيضيف الموقع https:// تلقائياً عند الحاجة.',
+          validation: (rule) => rule.required().custom((value) => {
+            if (!value || !value.trim()) return 'أدخل رابط الحساب.';
+            const trimmed = value.trim();
+            const candidate = trimmed.startsWith('http://') || trimmed.startsWith('https://') ? trimmed : `https://${trimmed}`;
+            try {
+              const parsed = new URL(candidate);
+              return parsed.hostname.includes('.') ? true : 'أدخل رابطاً صحيحاً يحتوي على اسم نطاق.';
+            } catch {
+              return 'أدخل رابطاً صحيحاً مثل https://instagram.com/username.';
+            }
+          }),
+        }),
         defineField({name: 'enabled', title: 'إظهار الحساب', type: 'boolean', initialValue: true}),
       ], preview: {
         select: {platform: 'platform', title: 'label', subtitle: 'url', enabled: 'enabled'},
@@ -78,7 +94,7 @@ export const siteSettings = defineType({
     imageField('logo', 'الشعار المرفوع', 'ارفع الشعار الذي سيظهر في الشريط العلوي والتذييل. يبقى الشعار الاحتياطي كما هو إذا تركت الحقل فارغاً.', 'media'),
     imageField('logoLight', 'الشعار الأبيض / الفاتح', 'نسخة الشعار المناسبة فوق الخلفيات الداكنة. إذا تُركت فارغة، يستخدم الموقع معالجة تلقائية مؤقتة للنسخة الأساسية.', 'media'),
     defineField({name: 'logoScale', title: 'حجم الشعار', type: 'number', group: 'media', description: 'النطاق المدعوم من 50% إلى 200%.', validation: (rule) => rule.min(50).max(200)}),
-    imageField('profileImage', 'صورة التعريف في صفحة عن المهندس', 'صورة اختيارية تظهر في صفحة عن المهندس. استخدم Hotspot لتحديد الجزء المهم؛ إذا تُركت فارغة يستخدم الموقع صورة مؤقتة قابلة للاستبدال.', 'media'),
+    imageField('profileImage', 'الصورة الشخصية — صفحة عن المهندس', 'تعديل الصورة من هنا: ارفع صورة جديدة أو استبدل الصورة الحالية، ثم استخدم Hotspot لتحديد الجزء المهم. إذا تُركت فارغة يستخدم الموقع صورة مؤقتة قابلة للاستبدال.', 'media'),
     imageField('shareImage', 'صورة المشاركة الاجتماعية', 'تُعرض تلقائياً بنسبة 1200×630 عبر CDN. استخدم Hotspot لتحريك الصورة وتحديد الجزء المهم دون فراغات أو تمدد.', 'media'),
     defineField({
       name: 'shareImageUrl',

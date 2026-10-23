@@ -38,6 +38,7 @@ export const siteCopy = defineType({
             title: 'اسم مختصر للعنصر',
             type: 'string',
             description: 'اسم سهل التعرف عليه داخل القائمة.',
+            validation: (rule) => rule.required(),
           }),
           defineField({
             name: 'page',
@@ -63,21 +64,25 @@ export const siteCopy = defineType({
                 {title: 'زر WhatsApp', value: 'whatsapp'},
                 {title: 'المهارات', value: 'skills'},
                 {title: 'الخدمات الفردية', value: 'service'},
+                {title: 'صفحة غير موجودة 404', value: 'notFound'},
                 {title: 'أخرى', value: 'other'},
               ],
             },
+            validation: (rule) => rule.required(),
           }),
           defineField({
             name: 'english',
             title: 'النص بالإنجليزية',
             type: 'text',
             rows: 4,
+            validation: (rule) => rule.required(),
           }),
           defineField({
             name: 'arabic',
             title: 'النص بالعربية',
             type: 'text',
             rows: 4,
+            validation: (rule) => rule.required(),
           }),
         ],
         preview: {
