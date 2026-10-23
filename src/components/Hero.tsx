@@ -2,10 +2,9 @@ import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion
 import { Link } from 'react-router-dom';
 import { ArrowDown, ArrowRight } from 'lucide-react';
 import { useI18n } from '../i18n/I18nContext';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useHeroSettings } from '../hooks';
 import { optimizeImageUrl } from '../lib/sanity';
-import { siteMedia } from '../data/siteMedia';
 
 // Text reveal animation component
 const TextReveal = ({ children, delay = 0, reducedMotion = false }: { children: string; delay?: number; reducedMotion?: boolean }) => {
@@ -50,6 +49,7 @@ export default function Hero() {
   const backgroundUrl = background?.url || '';
   const focusX = background?.hotspot?.x;
   const focusY = background?.hotspot?.y;
+  const [failedBackgroundUrl, setFailedBackgroundUrl] = useState<string | null>(null);
   const mobileSources = backgroundUrl
     ? [640, 900].map((width) => `${optimizeImageUrl(backgroundUrl, { width, height: Math.round(width * 16 / 9), fit: 'crop', quality: 78, focusX, focusY })} ${width}w`).join(', ')
     : undefined;
@@ -58,12 +58,15 @@ export default function Hero() {
     : undefined;
   const backgroundImage = backgroundUrl
     ? optimizeImageUrl(backgroundUrl, { width: 1280, height: 720, fit: 'crop', quality: 78, focusX, focusY })
-    : siteMedia.mainHero;
+    : '';
+  const showBackground = Boolean(backgroundUrl) && failedBackgroundUrl !== backgroundUrl;
 
   return (
-    <section ref={ref} className="relative h-screen min-h-[700px] flex items-center overflow-hidden">
-      {/* Parallax Background */}
+    <section ref={ref} className="relative h-screen min-h-[700px] flex items-center overflow-hidden bg-navy">
+      {/* Show only the current Sanity image; never substitute a local/old image. */}
+      {showBackground && (
       <motion.div
+        key={backgroundUrl}
         style={{ y: prefersReducedMotion ? 0 : backgroundY }}
         className="absolute inset-0 -top-20 -bottom-20"
       >
@@ -80,6 +83,7 @@ export default function Hero() {
               src={backgroundImage}
               alt=""
               aria-hidden="true"
+              onError={() => setFailedBackgroundUrl(backgroundUrl)}
               fetchPriority="high"
               decoding="async"
               className="h-full w-full object-cover"
@@ -88,7 +92,8 @@ export default function Hero() {
           </picture>
         </motion.div>
       </motion.div>
-      
+      )}
+
       {/* Animated gradient overlay */}
       <motion.div
         initial={prefersReducedMotion ? false : { opacity: 0 }}

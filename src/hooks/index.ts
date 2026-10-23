@@ -41,6 +41,10 @@ const SETTINGS_QUERY = `*[_type == "siteSettings"][0] {
   "shareImageUrl": shareImage.asset->url
 }`;
 
+const HERO_BACKGROUND_QUERY = `*[_type == "siteSettings"][0] {
+  "heroBackground": {"url": heroBackground.asset->url, "hotspot": heroBackground.hotspot, "crop": heroBackground.crop}
+}`;
+
 const CONTENT_SECTIONS_FIELDS = `
   _id, page, titleAr, titleEn, bodyAr, bodyEn, linkUrl, linkLabelAr, linkLabelEn,
   "image": {"url": image.asset->url, "hotspot": image.hotspot, "crop": image.crop, "altAr": image.altAr, "altEn": image.altEn}
@@ -179,9 +183,9 @@ export function useSiteSettings() {
 }
 
 export function useHeroSettings() {
-  const remote = useSiteSettings();
-  const hero: any = remote.settings?.heroBackground?.url
-    ? { backgroundImage: remote.settings.heroBackground }
+  const remote = useRemote<any | null>(HERO_BACKGROUND_QUERY, null, 'no-store');
+  const hero: any = remote.data?.heroBackground?.url
+    ? { backgroundImage: remote.data.heroBackground }
     : null;
   return { ...remote, hero };
 }

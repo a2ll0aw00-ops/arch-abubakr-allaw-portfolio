@@ -1,9 +1,8 @@
 /**
- * Local image settings for the site's visual banners.
- * Replace these paths with files stored under public/images/ to update the visuals.
+ * Local image settings for project-category banners. The home hero background
+ * is managed only through the published Sanity site settings.
  */
 export const siteMedia = {
-  mainHero: '/images/hero.webp',
   projectHeaders: {
     all: '/images/projects-header.webp',
     residential: '/images/stock/modern-villa-pool.webp',
