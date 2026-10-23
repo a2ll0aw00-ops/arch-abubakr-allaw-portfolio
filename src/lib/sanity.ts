@@ -4,8 +4,9 @@ const SANITY_API_VERSION = '2026-10-22';
 
 const requestCache = new Map<string, Promise<unknown>>();
 
-export async function sanityQuery<T>(query: string): Promise<T> {
-  const cached = requestCache.get(query);
+export async function sanityQuery<T>(query: string, options: {cache?: RequestCache} = {}): Promise<T> {
+  const cacheMode = options.cache || 'default';
+  const cached = cacheMode === 'no-store' ? undefined : requestCache.get(query);
   if (cached) return cached as Promise<T>;
 
   const url = new URL(
@@ -16,18 +17,18 @@ export async function sanityQuery<T>(query: string): Promise<T> {
 
   const request = fetch(url, {
     headers: { Accept: 'application/json' },
-    cache: 'default',
+    cache: cacheMode,
   }).then(async (response) => {
     if (!response.ok) throw new Error(`CMS request failed (${response.status})`);
     const payload = (await response.json()) as { result: T };
     return payload.result;
   });
 
-  requestCache.set(query, request);
+  if (cacheMode !== 'no-store') requestCache.set(query, request);
   try {
     return await request as T;
   } catch (error) {
-    requestCache.delete(query);
+    if (cacheMode !== 'no-store') requestCache.delete(query);
     throw error;
   }
 }

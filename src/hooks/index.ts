@@ -67,7 +67,7 @@ interface RemoteState<T> {
   hasData: boolean;
 }
 
-function useRemote<T>(query: string, initial: T): RemoteState<T> {
+function useRemote<T>(query: string, initial: T, cache: RequestCache = 'default'): RemoteState<T> {
   const [state, setState] = useState<RemoteState<T>>({
     data: initial,
     loading: true,
@@ -77,7 +77,7 @@ function useRemote<T>(query: string, initial: T): RemoteState<T> {
 
   useEffect(() => {
     let active = true;
-    sanityQuery<T>(query)
+    sanityQuery<T>(query, {cache})
       .then((data: T) => {
         if (!active) return;
         const hasData = Array.isArray(data) ? data.length > 0 : data !== null && data !== undefined;
@@ -93,7 +93,7 @@ function useRemote<T>(query: string, initial: T): RemoteState<T> {
         });
       });
     return () => { active = false; };
-  }, [query]);
+  }, [query, cache]);
 
   return state;
 }
@@ -150,12 +150,12 @@ function mapProject(record: any) {
 }
 
 export function useProjects() {
-  const remote = useRemote<any[]>(PROJECTS_QUERY, []);
+  const remote = useRemote<any[]>(PROJECTS_QUERY, [], 'no-store');
   return { ...remote, projects: remote.data.map(mapProject) };
 }
 
 export function useFeaturedProjects() {
-  const remote = useRemote<any[]>(FEATURED_PROJECTS_QUERY, []);
+  const remote = useRemote<any[]>(FEATURED_PROJECTS_QUERY, [], 'no-store');
   return { ...remote, projects: remote.data.map(mapProject) };
 }
 
@@ -169,7 +169,7 @@ export function useProjectBySlug(slug: string) {
     scopeEn, scopeAr, conceptEn, conceptAr, methodologyEn, methodologyAr,
     software, featured, order
   }`;
-  const remote = useRemote<any | null>(query, null);
+  const remote = useRemote<any | null>(query, null, 'no-store');
   return { ...remote, project: remote.data ? mapProject(remote.data) : null };
 }
 
