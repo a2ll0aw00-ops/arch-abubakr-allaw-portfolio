@@ -18,7 +18,7 @@ export default function Contact() {
   const whatsappUrl = whatsapp.startsWith('http') ? whatsapp : `https://wa.me/${whatsapp}`;
 
   return (
-    <section className="py-20 lg:py-28 bg-navy text-white relative overflow-hidden">
+    <section className="pt-16 pb-8 lg:pt-20 lg:pb-10 bg-navy text-white relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute top-0 right-0 w-96 h-96 border border-white/20" />
@@ -42,7 +42,7 @@ export default function Contact() {
               </p>
 
               {/* Contact Info */}
-              <div className="space-y-4 mb-8">
+              <div className="space-y-4">
                 <a
                   href={`mailto:${email}`}
                   className={`flex items-center gap-4 text-white/70 hover:text-bronze transition-colors group ${lang === 'ar' ? 'flex-row-reverse text-right' : ''}`}
