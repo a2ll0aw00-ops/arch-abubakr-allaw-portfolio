@@ -1,18 +1,39 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 export default function ScrollProgress() {
-  const [progress, setProgress] = useState(0);
+  const progressRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const currentProgress = (window.scrollY / totalHeight) * 100;
-      setProgress(currentProgress);
+    let animationFrame: number | null = null;
+
+    const updateProgress = () => {
+      const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+      const progress = maxScroll > 0
+        ? Math.min(1, Math.max(0, window.scrollY / maxScroll))
+        : 0;
+
+      progressRef.current?.style.setProperty('--scroll-progress', String(progress));
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    const scheduleUpdate = () => {
+      if (animationFrame !== null) return;
+
+      animationFrame = window.requestAnimationFrame(() => {
+        animationFrame = null;
+        updateProgress();
+      });
+    };
+
+    scheduleUpdate();
+    window.addEventListener('scroll', scheduleUpdate, { passive: true });
+    window.addEventListener('resize', scheduleUpdate, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', scheduleUpdate);
+      window.removeEventListener('resize', scheduleUpdate);
+      if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
+    };
   }, []);
 
-  return <div className="scroll-progress" style={{ width: `${progress}%` }} />;
+  return <div ref={progressRef} className="scroll-progress" aria-hidden="true" />;
 }

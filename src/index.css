@@ -136,15 +136,20 @@ img {
   position: fixed;
   top: 0;
   left: 0;
+  width: 100%;
   height: 2px;
   background: linear-gradient(90deg, #C7A66A, #d4b87e);
   z-index: 9999;
-  transition: width 0.1s linear;
+  transform: scaleX(var(--scroll-progress, 0));
+  transform-origin: left center;
+  will-change: transform;
+  pointer-events: none;
 }
 
 html[dir="rtl"] .scroll-progress {
   left: auto;
   right: 0;
+  transform-origin: right center;
 }
 
 /* Print styles */
