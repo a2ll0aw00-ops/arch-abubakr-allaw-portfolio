@@ -3,7 +3,7 @@ import { sanityQuery } from '../lib/sanity';
 
 const PROJECTS_QUERY = `*[_type == "project" && visible != false] | order(order asc, _createdAt asc) {
   _id, _type, titleEn, titleAr, slug, subtitleEn, subtitleAr,
-  descriptionEn, descriptionAr, categoryEn, categoryAr,
+  descriptionEn, descriptionAr, categoryEn, categoryAr, categoryKey, categoryCustomEn, categoryCustomAr,
   "coverUrl": coalesce(coverImage.asset->url, coverImageUrl),
   "uploadedGallery": gallery[]{"url": asset->url}, galleryUrls,
   locationEn, locationAr, year, area, client, status, roleEn, roleAr,
@@ -13,7 +13,7 @@ const PROJECTS_QUERY = `*[_type == "project" && visible != false] | order(order 
 
 const FEATURED_PROJECTS_QUERY = `*[_type == "project" && visible != false && featured == true] | order(order asc, _createdAt asc) [0...6] {
   _id, _type, titleEn, titleAr, slug, subtitleEn, subtitleAr,
-  descriptionEn, descriptionAr, categoryEn, categoryAr,
+  descriptionEn, descriptionAr, categoryEn, categoryAr, categoryKey, categoryCustomEn, categoryCustomAr,
   "coverUrl": coalesce(coverImage.asset->url, coverImageUrl),
   "uploadedGallery": gallery[]{"url": asset->url}, galleryUrls,
   locationEn, locationAr, year, area, client, status, roleEn, roleAr,
@@ -98,11 +98,32 @@ function useRemote<T>(query: string, initial: T): RemoteState<T> {
   return state;
 }
 
+const BUILT_IN_PROJECT_CATEGORIES = {
+  residential: {en: 'Residential', ar: 'سكني'},
+  commercial: {en: 'Commercial', ar: 'تجاري'},
+  interior: {en: 'Interior', ar: 'داخلي'},
+  visualization: {en: 'Visualization', ar: 'إظهار'},
+} as const;
+
+function mapProjectCategory(record: any) {
+  const key = typeof record.categoryKey === 'string' ? record.categoryKey : '';
+  const builtIn = BUILT_IN_PROJECT_CATEGORIES[key as keyof typeof BUILT_IN_PROJECT_CATEGORIES];
+  const nameEn = builtIn?.en || String(record.categoryCustomEn || record.categoryEn || '').trim();
+  const nameAr = builtIn?.ar || String(record.categoryCustomAr || record.categoryAr || '').trim() || nameEn;
+  const id = builtIn
+    ? key
+    : key === 'other'
+      ? `other:${nameEn.toLocaleLowerCase()}|${nameAr}`
+      : nameEn || nameAr || 'other';
+  return {_id: id, _type: 'category' as const, nameEn, nameAr};
+}
+
 function mapProject(record: any) {
   const uploadedGallery = Array.isArray(record.uploadedGallery) ? record.uploadedGallery.map((item: any) => item?.url).filter(Boolean) : [];
   const gallery = uploadedGallery.length > 0
     ? uploadedGallery
     : (Array.isArray(record.galleryUrls) ? record.galleryUrls : []);
+  const category = mapProjectCategory(record);
   return {
     _id: record._id,
     _type: 'project',
@@ -110,12 +131,7 @@ function mapProject(record: any) {
     slug: record.slug?.current ? record.slug : { current: record.slug || record._id },
     subtitle: { en: record.subtitleEn || '', ar: record.subtitleAr || '' },
     description: { en: record.descriptionEn || '', ar: record.descriptionAr || '' },
-    category: {
-      _id: record.categoryEn || 'Other',
-      _type: 'category',
-      nameEn: record.categoryEn || '',
-      nameAr: record.categoryAr || '',
-    },
+    category,
     coverImage: record.coverUrl || gallery[0],
     gallery,
     location: { en: record.locationEn || '', ar: record.locationAr || '' },
@@ -146,7 +162,7 @@ export function useFeaturedProjects() {
 export function useProjectBySlug(slug: string) {
   const query = `*[_type == "project" && slug.current == ${JSON.stringify(slug)} && visible != false][0] {
     _id, _type, titleEn, titleAr, slug, subtitleEn, subtitleAr,
-    descriptionEn, descriptionAr, categoryEn, categoryAr,
+    descriptionEn, descriptionAr, categoryEn, categoryAr, categoryKey, categoryCustomEn, categoryCustomAr,
     "coverUrl": coalesce(coverImage.asset->url, coverImageUrl),
     "uploadedGallery": gallery[]{"url": asset->url}, galleryUrls,
     locationEn, locationAr, year, area, client, status, roleEn, roleAr,

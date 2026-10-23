@@ -16,6 +16,7 @@ export const project = defineType({
     {name: 'identity', title: 'بيانات المشروع'},
     {name: 'details', title: 'التفاصيل'},
     {name: 'media', title: 'الصور والمعرض'},
+    {name: 'classification', title: 'القسم والترتيب'},
     {name: 'publishing', title: 'الظهور والترتيب'},
   ],
   fields: [
@@ -24,8 +25,26 @@ export const project = defineType({
     defineField({name: 'slug', title: 'الرابط المختصر', type: 'slug', group: 'identity', options: {source: 'titleEn', maxLength: 96}, description: 'يُستخدم في رابط صفحة تفاصيل المشروع. لا تغيّر slug المنشور دون مراجعة.'}),
     ...bilingual('subtitle', 'العنوان الفرعي', 'identity', 2),
     ...bilingual('description', 'الوصف', 'identity', 5),
-    defineField({name: 'categoryEn', title: 'التصنيف بالإنجليزية', type: 'string', group: 'identity'}),
-    defineField({name: 'categoryAr', title: 'التصنيف بالعربية', type: 'string', group: 'identity'}),
+    defineField({name: 'categoryKey', title: 'قسم المشروع', type: 'string', group: 'classification', options: {
+      layout: 'dropdown',
+      list: [
+        {title: 'سكني · Residential', value: 'residential'},
+        {title: 'تجاري · Commercial', value: 'commercial'},
+        {title: 'داخلي · Interior', value: 'interior'},
+        {title: 'إظهار · Visualization', value: 'visualization'},
+        {title: 'أخرى · Custom category', value: 'other'},
+      ],
+    }, validation: (rule) => rule.required(), description: 'اختر فئة المشروع. عند اختيار «أخرى» أدخل الاسم باللغتين في الحقول التي ستظهر.'}),
+    defineField({name: 'categoryCustomEn', title: 'اسم القسم بالإنجليزية (أخرى)', type: 'string', group: 'classification', hidden: ({parent}) => parent?.categoryKey !== 'other', validation: (rule) => rule.custom((value, context) => {
+      if ((context.document as any)?.categoryKey !== 'other') return true;
+      return typeof value === 'string' && value.trim() ? true : 'أدخل اسم القسم بالإنجليزية عند اختيار «أخرى».';
+    })}),
+    defineField({name: 'categoryCustomAr', title: 'اسم القسم بالعربية (أخرى)', type: 'string', group: 'classification', hidden: ({parent}) => parent?.categoryKey !== 'other', validation: (rule) => rule.custom((value, context) => {
+      if ((context.document as any)?.categoryKey !== 'other') return true;
+      return typeof value === 'string' && value.trim() ? true : 'أدخل اسم القسم بالعربية عند اختيار «أخرى».';
+    })}),
+    defineField({name: 'categoryEn', title: 'التصنيف القديم بالإنجليزية', type: 'string', group: 'identity', hidden: true, readOnly: true, description: 'حقل توافق قديم محفوظ للبيانات السابقة؛ استخدم «قسم المشروع».'}),
+    defineField({name: 'categoryAr', title: 'التصنيف القديم بالعربية', type: 'string', group: 'identity', hidden: true, readOnly: true, description: 'حقل توافق قديم محفوظ للبيانات السابقة؛ استخدم «قسم المشروع».'}),
     defineField({name: 'locationEn', title: 'الموقع بالإنجليزية', type: 'string', group: 'details'}),
     defineField({name: 'locationAr', title: 'الموقع بالعربية', type: 'string', group: 'details'}),
     defineField({name: 'year', title: 'السنة', type: 'string', group: 'details'}),
@@ -43,7 +62,7 @@ export const project = defineType({
     defineField({name: 'galleryUrls', title: 'روابط المعرض القديمة', type: 'array', group: 'media', hidden: true, readOnly: true, components: {input: LegacyUrlArrayPreviewInput}, of: [{type: 'string'}], description: 'حقل توافق قديم مخفي؛ استخدم معرض الصور المرفوع.'}),
     defineField({name: 'visible', title: 'إظهار المشروع للعامة', type: 'boolean', group: 'publishing', initialValue: true}),
     defineField({name: 'featured', title: 'إظهار في الرئيسية', type: 'boolean', group: 'publishing'}),
-    defineField({name: 'order', title: 'ترتيب العرض', type: 'number', group: 'publishing'}),
+    defineField({name: 'order', title: 'ترتيب العرض', type: 'number', group: 'classification', description: 'رقم صحيح موجب؛ الأقل يظهر أولاً في صفحة المشاريع والتنقل بين المشاريع.', validation: (rule) => rule.required().integer().min(1)}),
   ],
   preview: {select: {title: 'titleEn', subtitle: 'titleAr', media: 'coverImage'}},
 });
