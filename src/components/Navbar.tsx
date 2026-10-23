@@ -58,7 +58,7 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-3 group">
-              <BrandMark variant={logoVariant} className="w-10 h-10 shrink-0 text-bronze transition-transform duration-500 group-hover:-translate-y-0.5" />
+              <BrandMark variant={logoVariant} priority className="w-10 h-10 shrink-0 text-bronze transition-transform duration-500 group-hover:-translate-y-0.5" />
               <div className="hidden sm:block">
                 <span className={`font-semibold text-sm tracking-widest uppercase transition-colors ${
                   scrolled ? 'text-navy' : 'text-white'

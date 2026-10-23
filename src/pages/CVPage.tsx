@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { profileData } from '../data/content';
 import { cvResume } from '../data/cvResume';
 import { useProfileContent, useSiteSettings } from '../hooks';
+import { toTelHref } from '../lib/contactLinks';
 
 type Language = 'ar' | 'en';
 type Localized = { ar?: string; en?: string } | string | undefined | null;
@@ -108,7 +109,7 @@ export default function CVPage() {
           <p className="text-sm leading-relaxed text-white/55 print:text-navy/60">{descriptor}</p>
           <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm text-white/70 print:text-navy/70">
             <span className="flex items-center gap-2"><MapPin size={14} className="text-bronze" />{location}</span>
-            <a href={`tel:${phone}`} className="flex items-center gap-2" dir="ltr"><Phone size={14} className="text-bronze" />{phone}</a>
+            <a href={toTelHref(phone)} className="flex items-center gap-2" dir="ltr"><Phone size={14} className="text-bronze" />{phone}</a>
             <a href={`mailto:${email}`} className="flex items-center gap-2"><Mail size={14} className="text-bronze" />{email}</a>
           </div>
           <div className="mt-5 flex flex-wrap gap-4 text-sm print:hidden">

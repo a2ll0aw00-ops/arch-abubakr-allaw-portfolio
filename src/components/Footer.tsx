@@ -4,6 +4,7 @@ import { useI18n } from '../i18n/I18nContext';
 import { profileData } from '../data/content';
 import { useSiteSettings, useSocialLinks } from '../hooks';
 import BrandMark from './BrandMark';
+import { toTelHref } from '../lib/contactLinks';
 import { Instagram, Linkedin, Facebook, Twitter, Youtube, Globe, Mail, Phone, MapPin } from 'lucide-react';
 import { 
   BehanceIcon, 
@@ -114,7 +115,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href={`tel:${phone}`}
+                  href={toTelHref(phone)}
                   className="text-white/60 text-sm hover:text-bronze transition-colors duration-300 flex items-center gap-2 group"
                   aria-label={`Phone: ${phone}`}
                   dir="ltr"

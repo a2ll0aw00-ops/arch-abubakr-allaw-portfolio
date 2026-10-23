@@ -1,23 +1,28 @@
 import { useSiteSettings } from '../hooks';
+import { optimizeImageUrl } from '../lib/sanity';
 
 type BrandMarkProps = {
   className?: string;
   variant?: 'dark' | 'light';
+  priority?: boolean;
 };
 
 /** Uses the managed logo when available and preserves the existing facade mark as fallback. */
-export default function BrandMark({ className = '', variant = 'dark' }: BrandMarkProps) {
+export default function BrandMark({ className = '', variant = 'dark', priority = false }: BrandMarkProps) {
   const { settings } = useSiteSettings();
   const lightLogoUrl = settings?.logoLightUrl;
   const logoUrl = variant === 'light' ? (lightLogoUrl || settings?.logoUrl) : settings?.logoUrl;
+  const optimizedLogoUrl = logoUrl ? optimizeImageUrl(logoUrl, { width: 256, height: 256, fit: 'max', quality: 78 }) : undefined;
   const scale = Math.min(200, Math.max(50, Number(settings?.logoScale) || 100));
 
-  if (logoUrl) {
+  if (optimizedLogoUrl) {
     return (
       <img
-        src={logoUrl}
+        src={optimizedLogoUrl}
         alt=""
         aria-hidden="true"
+        loading={priority ? 'eager' : 'lazy'}
+        decoding="async"
         className={`${className} object-contain`}
         style={{
           transform: `scale(${scale / 100})`,

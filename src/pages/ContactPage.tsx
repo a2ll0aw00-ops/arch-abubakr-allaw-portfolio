@@ -5,6 +5,7 @@ import { profileData } from '../data/content';
 import { useI18n } from '../i18n/I18nContext';
 import { useSiteSettings } from '../hooks';
 import { Mail, MapPin, Phone, Send, MessageCircle } from 'lucide-react';
+import { toTelHref } from '../lib/contactLinks';
 
 export default function ContactPage() {
   const { t, lang } = useI18n();
@@ -82,7 +83,7 @@ export default function ContactPage() {
                       </div>
                     </a>
                     <a
-                      href={`tel:${phone}`}
+                      href={toTelHref(phone)}
                       className={`flex items-center gap-4 text-navy/70 hover:text-bronze transition-colors group ${lang === 'ar' ? 'flex-row-reverse text-right' : ''}`}
                     >
                       <div className="w-11 h-11 border border-navy/10 flex items-center justify-center group-hover:border-bronze/50 transition-colors flex-shrink-0">
