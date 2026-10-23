@@ -41,6 +41,11 @@ const SETTINGS_QUERY = `*[_type == "siteSettings"][0] {
   "shareImageUrl": shareImage.asset->url
 }`;
 
+const CONTENT_SECTIONS_FIELDS = `
+  _id, page, titleAr, titleEn, bodyAr, bodyEn, linkUrl, linkLabelAr, linkLabelEn,
+  "image": {"url": image.asset->url, "hotspot": image.hotspot, "crop": image.crop, "altAr": image.altAr, "altEn": image.altEn}
+`;
+
 const SITE_COPY_QUERY = `*[_type == "siteCopy"]{entries[]{key, english, arabic}}`;
 const PROFILE_CONTENT_QUERY = `*[_type == "profileContent"][0]{
   cvNameAr, cvNameEn, cvRoleAr, cvRoleEn, cvDescriptorAr, cvDescriptorEn, linkedinUrl,
@@ -209,6 +214,16 @@ export function useSiteCopy() {
 
 export function useProfileContent() {
   return useRemote<any | null>(PROFILE_CONTENT_QUERY, null);
+}
+
+export function useCustomContentSections(page: string) {
+  const query = `*[_type == "customSection" && visible != false && page == ${JSON.stringify(page)} && defined(titleAr) && titleAr != "" && defined(bodyAr) && bodyAr != ""] | order(order asc, _createdAt asc) {${CONTENT_SECTIONS_FIELDS}}`;
+  const remote = useRemote<any[]>(query, []);
+  const sections = remote.data.filter((section: any) =>
+    typeof section.titleAr === 'string' && section.titleAr.trim().length > 0 &&
+    typeof section.bodyAr === 'string' && section.bodyAr.trim().length > 0,
+  );
+  return {...remote, sections};
 }
 
 export function useSkills() { return { skills: null as any, loading: false, error: null, hasData: false }; }

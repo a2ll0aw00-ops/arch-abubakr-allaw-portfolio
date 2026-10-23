@@ -56,6 +56,9 @@ export const structure = (S: StructureBuilder) =>
         .title('الملف المهني والسيرة')
         .child(S.documentTypeList('profileContent').title('الملف المهني')),
       S.listItem()
+        .title('أقسام محتوى إضافية')
+        .child(S.documentTypeList('customSection').title('الأقسام الإضافية').defaultOrdering([{field: 'order', direction: 'asc'}])),
+      S.listItem()
         .title('مكتبة الوسائط')
         .child(
           S.list()

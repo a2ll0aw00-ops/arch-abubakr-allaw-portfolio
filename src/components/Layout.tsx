@@ -8,11 +8,23 @@ import { ErrorBoundary } from './ErrorBoundary';
 import { useSiteSettings } from '../hooks';
 import { useI18n } from '../i18n/I18nContext';
 import { optimizeImageUrl } from '../lib/sanity';
+import CustomContentSections from './CustomContentSections';
 
 export default function Layout() {
   const location = useLocation();
   const { settings } = useSiteSettings();
   const { lang } = useI18n();
+  const normalizedPath = location.pathname.replace(/\/+$/, '') || '/';
+  const customSectionPage = /^\/projects\/[^/]+$/.test(normalizedPath)
+    ? 'projectDetail'
+    : ({
+      '/': 'home',
+      '/about': 'about',
+      '/projects': 'projects',
+      '/services': 'services',
+      '/cv': 'cv',
+      '/contact': 'contact',
+    } as Record<string, string>)[normalizedPath] || null;
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -134,7 +146,10 @@ export default function Layout() {
         </div>
         <main className="flex-1">
           <ErrorBoundary resetKey={location.pathname}>
-            <Outlet />
+            <>
+              <Outlet />
+              {customSectionPage && <CustomContentSections page={customSectionPage} />}
+            </>
           </ErrorBoundary>
         </main>
         <div className="no-print">
