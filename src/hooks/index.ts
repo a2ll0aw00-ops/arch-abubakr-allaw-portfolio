@@ -36,12 +36,24 @@ const SETTINGS_QUERY = `*[_type == "siteSettings"][0] {
   "nationality": nationalityEn, "nationalityAr": nationalityAr,
   seoTitle, seoDescription, seoTitleAr, seoTitleEn, seoDescriptionAr, seoDescriptionEn,
   "profileImage": {"url": profileImage.asset->url, "hotspot": profileImage.hotspot, "crop": profileImage.crop},
+  "heroBackground": {"url": heroBackground.asset->url, "hotspot": heroBackground.hotspot, "crop": heroBackground.crop},
   "shareImage": {"url": shareImage.asset->url, "hotspot": shareImage.hotspot, "crop": shareImage.crop},
   "shareImageUrl": shareImage.asset->url
 }`;
 
 const SITE_COPY_QUERY = `*[_type == "siteCopy"]{entries[]{key, english, arabic}}`;
-const PROFILE_CONTENT_QUERY = `*[_type == "profileContent"][0]{personalSkills[]{en,ar}, software[]{en,ar}, education[]{degreeEn,degreeAr,institutionEn,institutionAr,periodEn,periodAr}, experience[]{roleEn,roleAr,companyEn,companyAr,locationEn,locationAr,periodEn,periodAr,descriptionEn,descriptionAr}, languages[]{nameEn,nameAr,levelEn,levelAr}}`;
+const PROFILE_CONTENT_QUERY = `*[_type == "profileContent"][0]{
+  cvNameAr, cvNameEn, cvRoleAr, cvRoleEn, cvDescriptorAr, cvDescriptorEn, linkedinUrl,
+  summaryAr, summaryEn,
+  personalSkills[]{en,ar}, software[]{en,ar},
+  technicalSkillGroups[]{titleEn,titleAr,skills[]{nameEn,nameAr,levelEn,levelAr,descriptionEn,descriptionAr}},
+  education[]{degreeEn,degreeAr,institutionEn,institutionAr,periodEn,periodAr,departmentEn,departmentAr,gradeEn,gradeAr,detailsEn,detailsAr},
+  experience[]{roleEn,roleAr,companyEn,companyAr,locationEn,locationAr,periodEn,periodAr,descriptionEn,descriptionAr,responsibilitiesEn,responsibilitiesAr},
+  training[]{titleEn,titleAr,organizationEn,organizationAr,detailsEn,detailsAr},
+  selectedProjects[]{titleEn,titleAr,metaEn,metaAr,descriptionEn,descriptionAr},
+  professionalSkills[]{en,ar},
+  languages[]{nameEn,nameAr,levelEn,levelAr}
+}`;
 
 interface RemoteState<T> {
   data: T;
@@ -146,7 +158,11 @@ export function useSiteSettings() {
 }
 
 export function useHeroSettings() {
-  return { hero: null as any, loading: false, error: null, hasData: false };
+  const remote = useSiteSettings();
+  const hero: any = remote.settings?.heroBackground?.url
+    ? { backgroundImage: remote.settings.heroBackground }
+    : null;
+  return { ...remote, hero };
 }
 
 export function useServices() {

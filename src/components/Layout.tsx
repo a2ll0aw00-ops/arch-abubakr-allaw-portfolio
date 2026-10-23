@@ -128,15 +128,19 @@ export default function Layout() {
   return (
     <ErrorBoundary resetKey={location.pathname}>
       <div className="min-h-screen flex flex-col">
-        <ScrollProgress />
-        <Navbar />
+        <div className="no-print">
+          <ScrollProgress />
+          <Navbar />
+        </div>
         <main className="flex-1">
           <ErrorBoundary resetKey={location.pathname}>
             <Outlet />
           </ErrorBoundary>
         </main>
-        <Footer />
-        <WhatsAppButton />
+        <div className="no-print">
+          <Footer />
+          <WhatsAppButton />
+        </div>
       </div>
     </ErrorBoundary>
   );
