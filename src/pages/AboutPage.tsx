@@ -4,6 +4,10 @@ import { services as fallbackServices, skillsData } from '../data/content';
 import { useI18n } from '../i18n/I18nContext';
 import { getLocalizedText } from '../types';
 import { Building, Box, Eye, Layout } from 'lucide-react';
+import { useServices, useSiteSettings } from '../hooks';
+import { optimizeImageUrl } from '../lib/sanity';
+
+const FALLBACK_PROFILE_IMAGE = '/about-placeholder.webp';
 
 const iconMap: Record<string, any> = {
   building: Building,
@@ -14,7 +18,17 @@ const iconMap: Record<string, any> = {
 
 export default function AboutPage() {
   const { t, lang } = useI18n();
-  const services = fallbackServices;
+  const { settings } = useSiteSettings();
+  const { services: cmsServices, hasData: hasCmsServices } = useServices();
+  const services = hasCmsServices ? cmsServices : fallbackServices;
+  const profileImage = settings?.profileImage?.url || FALLBACK_PROFILE_IMAGE;
+  const profileImageUrl = optimizeImageUrl(profileImage, {
+    width: 900,
+    height: 1125,
+    fit: 'crop',
+    focusX: settings?.profileImage?.hotspot?.x,
+    focusY: settings?.profileImage?.hotspot?.y,
+  });
 
   return (
     <>
@@ -45,15 +59,14 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
             <AnimatedSection delay={0.1}>
               <div className="relative">
-                <div className="aspect-[4/5] bg-offwhite border border-navy/10 flex items-center justify-center">
-                  <div className="text-center p-8">
-                    <div className="w-24 h-24 mx-auto mb-6 bg-navy flex items-center justify-center">
-                      <span className="text-bronze font-bold text-3xl tracking-wider">AA</span>
-                    </div>
-                    <p className="text-navy/60 text-sm tracking-wider uppercase">
-                      {t('aboutPage.role')}
-                    </p>
-                  </div>
+                <div className="aspect-[4/5] bg-offwhite border border-navy/10 overflow-hidden">
+                  <img
+                    src={profileImageUrl}
+                    alt={lang === 'ar' ? 'صورة تعريفية للمهندس المعماري' : 'Portrait image for the architect profile'}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </div>
                 <div className="absolute -bottom-4 -right-4 w-full h-full border-2 border-bronze/30 -z-10" />
               </div>

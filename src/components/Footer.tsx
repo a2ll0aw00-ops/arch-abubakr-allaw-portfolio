@@ -48,7 +48,9 @@ export default function Footer() {
   // Use Sanity data if available, otherwise fallback
   const email = settings?.email || profileData.email;
   const phone = settings?.phone || profileData.phone;
-  const location = settings?.location || profileData.location;
+  const location = lang === 'ar'
+    ? settings?.locationAr || 'إب، اليمن'
+    : settings?.location || profileData.location;
 
   return (
     <footer className="bg-navy text-white">

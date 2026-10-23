@@ -79,7 +79,8 @@ export default function Layout() {
     setMeta('meta[name="twitter:title"]', 'name', 'twitter:title', title);
     setMeta('meta[name="twitter:description"]', 'name', 'twitter:description', pageDescription);
     setMeta('meta[name="twitter:url"]', 'name', 'twitter:url', canonicalUrl);
-    const shareImage = settings?.shareImage?.url || settings?.shareImageUrl;
+    const cmsShareImage = settings?.shareImage?.url || settings?.shareImageUrl;
+    const shareImage = cmsShareImage || `${siteOrigin}/images/hero.webp`;
     if (shareImage) {
       const imageUrl = optimizeImageUrl(shareImage, {
         width: 1200,
@@ -100,8 +101,8 @@ export default function Layout() {
         }
         image.content = value;
       }
-      setMeta('meta[property="og:image:width"]', 'property', 'og:image:width', '1200');
-      setMeta('meta[property="og:image:height"]', 'property', 'og:image:height', '630');
+      setMeta('meta[property="og:image:width"]', 'property', 'og:image:width', cmsShareImage ? '1200' : '2200');
+      setMeta('meta[property="og:image:height"]', 'property', 'og:image:height', cmsShareImage ? '630' : '1238');
     }
 
     const schemaId = 'abubakr-professional-schema';

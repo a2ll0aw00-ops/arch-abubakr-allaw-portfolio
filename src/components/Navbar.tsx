@@ -110,15 +110,6 @@ export default function Navbar() {
                 aria-label={theme === 'light' ? 'تفعيل النمط الليلي' : 'تفعيل النمط النهاري'}
                 title={theme === 'light' ? 'تفعيل النمط الليلي' : 'تفعيل النمط النهاري'}
               >
-                {lang === 'en' ? 'العربية' : 'EN'}
-              </button>
-
-              <button
-                onClick={toggleTheme}
-                className={`p-2 transition-colors ${scrolled ? 'text-navy/70 hover:text-bronze' : 'text-white/80 hover:text-white'}`}
-                aria-label={theme === 'light' ? 'تفعيل النمط الليلي' : 'تفعيل النمط النهاري'}
-                title={theme === 'light' ? 'تفعيل النمط الليلي' : 'تفعيل النمط النهاري'}
-              >
                 {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
               </button>
 
@@ -133,14 +124,6 @@ export default function Navbar() {
 
             {/* Mobile Menu Button */}
             <div className="flex items-center gap-2 lg:hidden">
-              <button
-                onClick={toggleTheme}
-                className={`p-2 transition-colors ${scrolled ? 'text-navy/70' : 'text-white/80'}`}
-                aria-label={theme === 'light' ? 'تفعيل النمط الليلي' : 'تفعيل النمط النهاري'}
-                title={theme === 'light' ? 'تفعيل النمط الليلي' : 'تفعيل النمط النهاري'}
-              >
-                {theme === 'light' ? <Moon size={17} /> : <Sun size={17} />}
-              </button>
               <button
                 onClick={toggleTheme}
                 className={`p-2 transition-colors ${scrolled ? 'text-navy/70' : 'text-white/80'}`}

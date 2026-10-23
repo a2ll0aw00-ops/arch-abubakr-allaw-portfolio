@@ -35,6 +35,7 @@ const SETTINGS_QUERY = `*[_type == "siteSettings"][0] {
   email, phone, whatsapp, "location": locationEn, "locationAr": locationAr,
   "nationality": nationalityEn, "nationalityAr": nationalityAr,
   seoTitle, seoDescription, seoTitleAr, seoTitleEn, seoDescriptionAr, seoDescriptionEn,
+  "profileImage": {"url": profileImage.asset->url, "hotspot": profileImage.hotspot, "crop": profileImage.crop},
   "shareImage": {"url": shareImage.asset->url, "hotspot": shareImage.hotspot, "crop": shareImage.crop},
   "shareImageUrl": shareImage.asset->url
 }`;
