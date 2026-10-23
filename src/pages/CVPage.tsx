@@ -26,7 +26,6 @@ export default function CVPage() {
   const email = settings?.email || profileData.email;
   const phone = settings?.phone || profileData.phone;
   const location = (lang === 'ar' ? settings?.locationAr : settings?.location) || cvResume.location[lang];
-  const nationality = (lang === 'ar' ? settings?.nationalityAr : settings?.nationality) || (lang === 'ar' ? 'يمني' : 'Yemeni');
   const name = cvIsManaged
     ? textFor({ ar: cvContent.cvNameAr, en: cvContent.cvNameEn }, lang) || cvResume.name[lang]
     : cvResume.name[lang];
@@ -111,7 +110,6 @@ export default function CVPage() {
             <span className="flex items-center gap-2"><MapPin size={14} className="text-bronze" />{location}</span>
             <a href={`tel:${phone}`} className="flex items-center gap-2" dir="ltr"><Phone size={14} className="text-bronze" />{phone}</a>
             <a href={`mailto:${email}`} className="flex items-center gap-2"><Mail size={14} className="text-bronze" />{email}</a>
-            <span>{t('cv.nationality')}: {nationality}</span>
           </div>
           <div className="mt-5 flex flex-wrap gap-4 text-sm print:hidden">
             <a href={linkedin} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-bronze hover:text-white">
