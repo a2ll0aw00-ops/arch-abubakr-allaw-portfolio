@@ -10,23 +10,39 @@ import CVPage from './pages/CVPage';
 import ContactPage from './pages/ContactPage';
 import NotFoundPage from './pages/NotFoundPage';
 
+function LocalizedRoutes() {
+  return (
+    <Routes>
+      <Route path="/" element={<Layout />}>
+        <Route index element={<HomePage />} />
+        <Route path="projects" element={<ProjectsPage />} />
+        <Route path="projects/:slug" element={<ProjectDetailPage />} />
+        <Route path="about" element={<AboutPage />} />
+        <Route path="services" element={<ServicesPage />} />
+        <Route path="cv" element={<CVPage />} />
+        <Route path="contact" element={<ContactPage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Route>
+      <Route path="/ar" element={<Layout />}>
+        <Route index element={<HomePage />} />
+        <Route path="projects" element={<ProjectsPage />} />
+        <Route path="projects/:slug" element={<ProjectDetailPage />} />
+        <Route path="about" element={<AboutPage />} />
+        <Route path="services" element={<ServicesPage />} />
+        <Route path="cv" element={<CVPage />} />
+        <Route path="contact" element={<ContactPage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Route>
+    </Routes>
+  );
+}
+
 export default function App() {
   return (
-    <I18nProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<HomePage />} />
-            <Route path="projects" element={<ProjectsPage />} />
-            <Route path="projects/:slug" element={<ProjectDetailPage />} />
-            <Route path="about" element={<AboutPage />} />
-            <Route path="services" element={<ServicesPage />} />
-            <Route path="cv" element={<CVPage />} />
-            <Route path="contact" element={<ContactPage />} />
-            <Route path="*" element={<NotFoundPage />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </I18nProvider>
+    <BrowserRouter>
+      <I18nProvider>
+        <LocalizedRoutes />
+      </I18nProvider>
+    </BrowserRouter>
   );
 }
