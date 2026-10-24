@@ -27,7 +27,10 @@ export default function ProjectsPage() {
         : category?._id || category?.slug?.current || getCategoryName(category, 'en');
       const label = getCategoryName(category, lang) || (typeof category === 'string' ? category : '');
       const englishName = getCategoryName(category, 'en') || (typeof category === 'string' ? category : label);
-      if (key && label) cats.set(key, { label, imageKey: getProjectHeaderKey(englishName) });
+      const imageKey = key in siteMedia.projectHeaders
+        ? key as keyof typeof siteMedia.projectHeaders
+        : getProjectHeaderKey(englishName);
+      if (key && label) cats.set(key, { label, imageKey });
     });
     return Array.from(cats, ([key, value]) => ({ key, ...value }));
   }, [projects, lang]);

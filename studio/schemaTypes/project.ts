@@ -34,7 +34,7 @@ export const project = defineType({
         {title: 'إظهار · Visualization', value: 'visualization'},
         {title: 'أخرى · Custom category', value: 'other'},
       ],
-    }, validation: (rule) => rule.required(), description: 'اختر فئة المشروع. عند اختيار «أخرى» أدخل الاسم باللغتين في الحقول التي ستظهر.'}),
+    }, validation: (rule) => rule.required(), description: 'اختر الفئة الأساسية للمشروع. لتغيير الاسم الظاهر لجميع المشاريع، عدّل «مسميات أقسام المشاريع» في إعدادات الموقع؛ لا تغيّر هذا المفتاح. عند اختيار «أخرى» أدخل الاسم باللغتين في الحقول التي ستظهر.'}),
     defineField({name: 'categoryCustomEn', title: 'اسم القسم بالإنجليزية (أخرى)', type: 'string', group: 'classification', hidden: ({parent}) => parent?.categoryKey !== 'other', validation: (rule) => rule.custom((value, context) => {
       if ((context.document as any)?.categoryKey !== 'other') return true;
       return typeof value === 'string' && value.trim() ? true : 'أدخل اسم القسم بالإنجليزية عند اختيار «أخرى».';

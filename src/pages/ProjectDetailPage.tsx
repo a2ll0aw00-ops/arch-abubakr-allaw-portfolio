@@ -1,8 +1,9 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, MapPin, Calendar, Maximize, Briefcase } from 'lucide-react';
+import { ArrowLeft, ArrowRight, MapPin, Calendar, Maximize, Briefcase, Expand } from 'lucide-react';
 import AnimatedSection from '../components/AnimatedSection';
+import ProjectImageLightbox from '../components/ProjectImageLightbox';
 import { projects as fallbackProjects } from '../data/content';
 import { useI18n } from '../i18n/I18nContext';
 import { useProjectBySlug, useProjects } from '../hooks';
@@ -11,6 +12,8 @@ import { getLocalizedText, getCategoryName, getEffectiveCoverImage, getProjectSl
 
 export default function ProjectDetailPage() {
   const { slug } = useParams<{ slug: string }>();
+  const [activeImageIndex, setActiveImageIndex] = useState<number | null>(null);
+  const closeLightbox = useCallback(() => setActiveImageIndex(null), []);
   const { t, lang } = useI18n();
   const { project: sanityProject, hasData, loading } = useProjectBySlug(slug || '');
   const { projects: allProjects } = useProjects();
@@ -94,10 +97,14 @@ export default function ProjectDetailPage() {
   const gallery: string[] = Array.isArray(project.gallery) ? project.gallery.filter((g: any) => typeof g === 'string') : [];
 
   // Safe image URL generation
+  let coverImageSource = '';
   let coverImageUrl = '';
   try {
     if (coverImage) {
-      coverImageUrl = typeof coverImage === 'string' 
+      coverImageSource = typeof coverImage === 'string'
+        ? coverImage
+        : urlFor(coverImage).url();
+      coverImageUrl = typeof coverImage === 'string'
         ? coverImage 
         : urlFor(coverImage).width(1920).height(1080).url();
       coverImageUrl = optimizeImageUrl(coverImageUrl, { width: 1920, height: 1080, fit: 'crop' });
@@ -105,22 +112,39 @@ export default function ProjectDetailPage() {
   } catch (error) {
     console.warn('Failed to generate cover image URL:', error);
   }
+  const lightboxImages = Array.from(new Set([coverImageSource, ...gallery].filter((src): src is string => Boolean(src))));
+  const openImage = (src: string) => {
+    const index = lightboxImages.indexOf(src);
+    if (index >= 0) setActiveImageIndex(index);
+  };
 
   return (
     <>
       {/* Hero Image */}
-      <section className="relative h-[50vh] min-h-[350px] bg-navy flex items-center justify-center">
+      <section className="relative h-[50vh] min-h-[350px] overflow-hidden bg-navy flex items-center justify-center">
         {/* Background Image */}
         {coverImageUrl && (
-          <motion.div
-            initial={{ scale: 1.1 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${coverImageUrl})` }}
-          />
+          <>
+            <motion.div
+              aria-hidden="true"
+              initial={{ scale: 1.1 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: `url(${coverImageUrl})` }}
+            />
+            <button
+              type="button"
+              onClick={() => openImage(coverImageSource)}
+              aria-label={lang === 'ar' ? `عرض صورة ${title} كاملة` : `View full cover image for ${title}`}
+              className="absolute inset-0 z-[1] cursor-zoom-in bg-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-bronze"
+            />
+            <span aria-hidden="true" className="pointer-events-none absolute bottom-6 right-6 z-[3] rounded-full bg-black/30 p-3 text-white/90">
+              <Expand size={18} />
+            </span>
+          </>
         )}
-        <div className="absolute inset-0 bg-gradient-to-b from-navy/70 via-navy/80 to-navy/90" />
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-[2] bg-gradient-to-b from-navy/70 via-navy/80 to-navy/90" />
         
         <div className="relative z-10 text-center px-6">
           <motion.div
@@ -274,7 +298,17 @@ export default function ProjectDetailPage() {
               {gallery.map((src, i) => (
                 <AnimatedSection key={src} delay={i * 0.1} className={i === 0 ? 'md:col-span-2' : ''}>
                   <div className={`group relative overflow-hidden bg-white ${i === 0 ? 'aspect-[16/9]' : 'aspect-[4/3]'}`}>
-                    <img src={optimizeImageUrl(src, { width: 1280, height: 960, fit: 'crop' })} alt={`${title} ${i + 1}`} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" decoding="async" />
+                    <button
+                      type="button"
+                      onClick={() => openImage(src)}
+                      aria-label={lang === 'ar' ? `عرض الصورة ${i + 1} كاملة لمشروع ${title}` : `View full image ${i + 1} for ${title}`}
+                      className="absolute inset-0 z-10 h-full w-full cursor-zoom-in focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-bronze"
+                    >
+                      <img src={optimizeImageUrl(src, { width: 1280, height: 960, fit: 'crop' })} alt={`${title} ${i + 1}`} className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" decoding="async" />
+                      <span aria-hidden="true" className="absolute bottom-4 right-4 rounded-full bg-navy/55 p-2.5 text-white opacity-90 transition-opacity group-hover:opacity-100">
+                        <Expand size={17} />
+                      </span>
+                    </button>
                   </div>
                 </AnimatedSection>
               ))}
@@ -315,6 +349,16 @@ export default function ProjectDetailPage() {
             </div>
           </div>
         </section>
+      )}
+      {activeImageIndex !== null && lightboxImages.length > 0 && (
+        <ProjectImageLightbox
+          images={lightboxImages}
+          currentIndex={activeImageIndex}
+          title={title}
+          lang={lang}
+          onClose={closeLightbox}
+          onIndexChange={setActiveImageIndex}
+        />
       )}
     </>
   );

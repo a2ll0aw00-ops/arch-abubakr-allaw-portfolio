@@ -10,6 +10,7 @@ export const siteSettings = defineType({
     {name: 'identity', title: 'الهوية'},
     {name: 'contact', title: 'التواصل'},
     {name: 'social', title: 'الحسابات الاجتماعية'},
+    {name: 'projectCategories', title: 'تصنيفات المشاريع'},
     {name: 'media', title: 'الشعار والوسائط'},
     {name: 'seo', title: 'SEO'},
   ],
@@ -90,6 +91,50 @@ export const siteSettings = defineType({
           return {title: `${enabled === false ? '◌ ' : '● '}${title || platform || 'حساب اجتماعي'}`, subtitle: subtitle || 'أضف رابط الحساب'};
         },
       }}],
+    }),
+    defineField({
+      name: 'projectCategoryLabels',
+      title: 'مسميات أقسام المشاريع',
+      type: 'array',
+      group: 'projectCategories',
+      description: 'غيّر الاسم الظاهر للفئات الأساسية هنا باللغتين. اتركه فارغاً لاستخدام الأسماء الافتراضية؛ لا تغيّر المفتاح لأنه يربط المشاريع بالفئة.',
+      initialValue: [
+        {key: 'residential', nameAr: 'سكني', nameEn: 'Residential'},
+        {key: 'commercial', nameAr: 'تجاري', nameEn: 'Commercial'},
+        {key: 'interior', nameAr: 'داخلي', nameEn: 'Interior'},
+        {key: 'visualization', nameAr: 'إظهار', nameEn: 'Visualization'},
+      ],
+      of: [{
+        type: 'object',
+        fields: [
+          defineField({
+            name: 'key',
+            title: 'الفئة الأساسية (ثابتة)',
+            type: 'string',
+            options: {layout: 'dropdown', list: [
+              {title: 'سكني · Residential', value: 'residential'},
+              {title: 'تجاري · Commercial', value: 'commercial'},
+              {title: 'داخلي · Interior', value: 'interior'},
+              {title: 'إظهار · Visualization', value: 'visualization'},
+            ]},
+            validation: (rule) => rule.required(),
+          }),
+          defineField({name: 'nameAr', title: 'الاسم المعروض بالعربية', type: 'string', validation: (rule) => rule.required()}),
+          defineField({name: 'nameEn', title: 'الاسم المعروض بالإنجليزية', type: 'string', validation: (rule) => rule.required()}),
+        ],
+        preview: {
+          select: {title: 'nameAr', subtitle: 'nameEn', key: 'key'},
+          prepare(selection) {
+            const {title, subtitle, key} = selection;
+            return {title: title || key || 'قسم مشروع', subtitle: `${subtitle || 'بدون اسم إنجليزي'} · ${key || 'بدون مفتاح'}`};
+          },
+        },
+      }],
+      validation: (rule) => rule.custom((value) => {
+        if (!Array.isArray(value)) return true;
+        const keys = value.map((item: any) => item?.key).filter((key: unknown) => typeof key === 'string' && key.length > 0);
+        return new Set(keys).size === keys.length || 'لا تضف الفئة نفسها أكثر من مرة.';
+      }),
     }),
     imageField('logo', 'الشعار المرفوع', 'ارفع الشعار الذي سيظهر في الشريط العلوي والتذييل. يبقى الشعار الاحتياطي كما هو إذا تركت الحقل فارغاً.', 'media'),
     imageField('logoLight', 'الشعار الأبيض / الفاتح', 'نسخة الشعار المناسبة فوق الخلفيات الداكنة. إذا تُركت فارغة، يستخدم الموقع معالجة تلقائية مؤقتة للنسخة الأساسية.', 'media'),
