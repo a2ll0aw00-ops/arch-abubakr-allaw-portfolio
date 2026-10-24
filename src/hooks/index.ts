@@ -8,7 +8,7 @@ const PROJECTS_QUERY = `*[_type == "project" && visible != false] | order(order 
   "categoryLabels": *[_type == "siteSettings"][0].projectCategoryLabels[key == ^.categoryKey][0] {nameEn, nameAr},
   "coverUrl": coalesce(coverImage.asset->url, coverImageUrl),
   "uploadedGallery": gallery[]{"url": asset->url}, galleryUrls,
-  locationEn, locationAr, year, area, client, status, roleEn, roleAr,
+  locationEn, locationAr, year, area, landDimensions, landArea, client, status, roleEn, roleAr,
   scopeEn, scopeAr, conceptEn, conceptAr, methodologyEn, methodologyAr,
   software, featured, order
 }`;
@@ -19,7 +19,7 @@ const FEATURED_PROJECTS_QUERY = `*[_type == "project" && visible != false && fea
   "categoryLabels": *[_type == "siteSettings"][0].projectCategoryLabels[key == ^.categoryKey][0] {nameEn, nameAr},
   "coverUrl": coalesce(coverImage.asset->url, coverImageUrl),
   "uploadedGallery": gallery[]{"url": asset->url}, galleryUrls,
-  locationEn, locationAr, year, area, client, status, roleEn, roleAr,
+  locationEn, locationAr, year, area, landDimensions, landArea, client, status, roleEn, roleAr,
   scopeEn, scopeAr, conceptEn, conceptAr, methodologyEn, methodologyAr,
   software, featured, order
 }`;
@@ -35,6 +35,7 @@ const SETTINGS_QUERY = `*[_type == "siteSettings"][0] {
   _id, siteName, fullNameEn, fullNameAr, roleEn, roleAr,
   descriptorEn, descriptorAr, summaryEn, summaryAr,
   "logoUrl": logo.asset->url, "logoLightUrl": logoLight.asset->url, logoScale, socialLinks[]{_key, platform, label, url, enabled},
+  projectCategoryLabels[]{key, nameAr, nameEn},
   email, phone, whatsapp, "location": locationEn, "locationAr": locationAr,
   "nationality": nationalityEn, "nationalityAr": nationalityAr,
   seoTitle, seoDescription, seoTitleAr, seoTitleEn, seoDescriptionAr, seoDescriptionEn,
@@ -124,6 +125,8 @@ function mapProject(record: any) {
     location: { en: record.locationEn || '', ar: record.locationAr || '' },
     year: record.year,
     area: record.area,
+    landDimensions: record.landDimensions,
+    landArea: record.landArea,
     client: record.client,
     status: record.status,
     role: { en: record.roleEn || '', ar: record.roleAr || '' },
@@ -153,7 +156,7 @@ export function useProjectBySlug(slug: string) {
     "categoryLabels": *[_type == "siteSettings"][0].projectCategoryLabels[key == ^.categoryKey][0] {nameEn, nameAr},
     "coverUrl": coalesce(coverImage.asset->url, coverImageUrl),
     "uploadedGallery": gallery[]{"url": asset->url}, galleryUrls,
-    locationEn, locationAr, year, area, client, status, roleEn, roleAr,
+    locationEn, locationAr, year, area, landDimensions, landArea, client, status, roleEn, roleAr,
     scopeEn, scopeAr, conceptEn, conceptAr, methodologyEn, methodologyAr,
     software, featured, order
   }`;
@@ -162,7 +165,7 @@ export function useProjectBySlug(slug: string) {
 }
 
 export function useSiteSettings() {
-  const remote = useRemote<any | null>(SETTINGS_QUERY, null);
+  const remote = useRemote<any | null>(SETTINGS_QUERY, null, 'no-store');
   return { ...remote, settings: remote.data };
 }
 

@@ -45,6 +45,8 @@ export interface Project {
   locationEn?: string;
   year?: string;
   area?: string;
+  landDimensions?: string;
+  landArea?: string;
   client?: string;
   status?: string;
   role?: string | MultilingualText;
@@ -127,6 +129,7 @@ export interface SiteSettings {
   nationality?: string;
   nationalityAr?: string;
   cvPdf?: any;
+  projectCategoryLabels?: Array<{key: string; nameEn?: string; nameAr?: string}>;
   socialLinks?: { platform: string; url: string }[];
   logoUrl?: string;
   logoLightUrl?: string;

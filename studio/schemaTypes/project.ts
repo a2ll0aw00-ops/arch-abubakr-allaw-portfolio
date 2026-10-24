@@ -28,13 +28,12 @@ export const project = defineType({
     defineField({name: 'categoryKey', title: 'قسم المشروع', type: 'string', group: 'classification', options: {
       layout: 'dropdown',
       list: [
-        {title: 'سكني · Residential', value: 'residential'},
-        {title: 'تجاري · Commercial', value: 'commercial'},
-        {title: 'داخلي · Interior', value: 'interior'},
-        {title: 'إظهار · Visualization', value: 'visualization'},
-        {title: 'أخرى · Custom category', value: 'other'},
+        {title: 'التصميم المعماري · Architectural Design', value: 'architectural-design'},
+        {title: 'المخططات المعمارية · Architectural Plans', value: 'architectural-plans'},
+        {title: 'نمذجة Revit وBIM والتوثيق المعماري · Revit BIM Modeling & Documentation', value: 'revit-bim-documentation'},
+        {title: 'التصميم الداخلي · Interior Design', value: 'interior-design'},
       ],
-    }, validation: (rule) => rule.required(), description: 'اختر الفئة الأساسية للمشروع. لتغيير الاسم الظاهر لجميع المشاريع، عدّل «مسميات أقسام المشاريع» في إعدادات الموقع؛ لا تغيّر هذا المفتاح. عند اختيار «أخرى» أدخل الاسم باللغتين في الحقول التي ستظهر.'}),
+    }, validation: (rule) => rule.required(), description: 'اختر إحدى الفئات الأربع. الأسماء المعروضة قابلة للتحرير من «مسميات أقسام المشاريع» في إعدادات الموقع؛ أبقِ المفتاح ثابتاً.'}),
     defineField({name: 'categoryCustomEn', title: 'اسم القسم بالإنجليزية (أخرى)', type: 'string', group: 'classification', hidden: ({parent}) => parent?.categoryKey !== 'other', validation: (rule) => rule.custom((value, context) => {
       if ((context.document as any)?.categoryKey !== 'other') return true;
       return typeof value === 'string' && value.trim() ? true : 'أدخل اسم القسم بالإنجليزية عند اختيار «أخرى».';
@@ -48,6 +47,8 @@ export const project = defineType({
     defineField({name: 'locationEn', title: 'الموقع بالإنجليزية', type: 'string', group: 'details'}),
     defineField({name: 'locationAr', title: 'الموقع بالعربية', type: 'string', group: 'details'}),
     defineField({name: 'year', title: 'السنة', type: 'string', group: 'details'}),
+    defineField({name: 'landDimensions', title: 'أبعاد الأرض', type: 'string', group: 'details', hidden: ({parent}) => parent?.categoryKey !== 'architectural-plans', description: 'اختياري؛ الطول × العرض بالمتر، مثل 20 × 30 م. أدخل الأبعاد المؤكدة فقط.'}),
+    defineField({name: 'landArea', title: 'مساحة الأرض', type: 'string', group: 'details', hidden: ({parent}) => parent?.categoryKey !== 'architectural-plans', description: 'اختياري؛ مساحة الأرض بالمتر المربع، مثل 600 م². لا تُحسب تلقائياً من الأبعاد.'}),
     defineField({name: 'area', title: 'المساحة', type: 'string', group: 'details'}),
     defineField({name: 'client', title: 'العميل', type: 'string', group: 'details'}),
     defineField({name: 'status', title: 'الحالة', type: 'string', group: 'details'}),

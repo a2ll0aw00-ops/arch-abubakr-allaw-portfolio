@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, MapPin, Calendar, Maximize, Briefcase, Expand } from 'lucide-react';
+import { ArrowLeft, ArrowRight, MapPin, Calendar, Maximize, Briefcase, Expand, Ruler } from 'lucide-react';
 import AnimatedSection from '../components/AnimatedSection';
 import ProjectImageLightbox from '../components/ProjectImageLightbox';
 import { projects as fallbackProjects } from '../data/content';
 import { useI18n } from '../i18n/I18nContext';
 import { useProjectBySlug, useProjects } from '../hooks';
 import { optimizeImageUrl, urlFor } from '../lib/sanity';
-import { getLocalizedText, getCategoryName, getEffectiveCoverImage, getProjectSlug } from '../types';
+import { getLocalizedText, getEffectiveCoverImage, getProjectSlug } from '../types';
+import { getProjectCategoryDisplayName, getProjectLandDetails } from '../lib/projectCategory';
 
 export default function ProjectDetailPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -32,7 +33,7 @@ export default function ProjectDetailPage() {
   useEffect(() => {
     if (!project) return;
     const title = getLocalizedText(project.title, lang);
-    const category = getCategoryName(project.category, lang);
+    const category = getProjectCategoryDisplayName(project.category, lang);
     const description = getLocalizedText(project.description, lang);
     const suffix = lang === 'ar' ? ' | أبوبكر علاو | مهندس معماري' : ' | Abubakr Allaw | Architect · BIM · Design';
     const pageDescription = description || (lang === 'ar'
@@ -90,10 +91,11 @@ export default function ProjectDetailPage() {
   const description = getLocalizedText(project.description, lang);
   const designConcept = getLocalizedText(project.designConcept, lang);
   const methodology = getLocalizedText(project.methodology, lang);
-  const category = getCategoryName(project.category, lang);
+  const category = getProjectCategoryDisplayName(project.category, lang);
   const location = getLocalizedText(project.location, lang);
   const role = getLocalizedText(project.role, lang);
   const scope = getLocalizedText(project.scope, lang);
+  const {landDimensions, landArea} = getProjectLandDetails(project);
   const gallery: string[] = Array.isArray(project.gallery) ? project.gallery.filter((g: any) => typeof g === 'string') : [];
 
   // Safe image URL generation
@@ -195,6 +197,24 @@ export default function ProjectDetailPage() {
                 <div>
                   <div className="text-xs text-navy/50 uppercase tracking-wider">{t('projects.year')}</div>
                   <div className="text-sm font-medium text-navy">{project.year}</div>
+                </div>
+              </div>
+            )}
+            {landDimensions && (
+              <div className={`flex items-center gap-3 ${lang === 'ar' ? 'flex-row-reverse' : ''}`}>
+                <Ruler size={16} className="text-bronze flex-shrink-0" />
+                <div>
+                  <div className="text-xs text-navy/50 uppercase tracking-wider">{lang === 'ar' ? 'أبعاد الأرض' : 'Land dimensions'}</div>
+                  <div className="text-sm font-medium text-navy">{landDimensions}</div>
+                </div>
+              </div>
+            )}
+            {landArea && (
+              <div className={`flex items-center gap-3 ${lang === 'ar' ? 'flex-row-reverse' : ''}`}>
+                <Maximize size={16} className="text-bronze flex-shrink-0" />
+                <div>
+                  <div className="text-xs text-navy/50 uppercase tracking-wider">{lang === 'ar' ? 'مساحة الأرض' : 'Land area'}</div>
+                  <div className="text-sm font-medium text-navy">{landArea}</div>
                 </div>
               </div>
             )}

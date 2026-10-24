@@ -4,49 +4,50 @@ import { Link } from 'react-router-dom';
 import AnimatedSection from '../components/AnimatedSection';
 import { projects as fallbackProjects } from '../data/content';
 import { useI18n } from '../i18n/I18nContext';
-import { useProjects } from '../hooks';
+import { useProjects, useSiteSettings } from '../hooks';
 import { optimizeImageUrl, urlFor } from '../lib/sanity';
-import { getLocalizedText, getCategoryName, getEffectiveCoverImage, getProjectSlug, Project } from '../types';
-import { getProjectHeaderKey, siteMedia } from '../data/siteMedia';
+import { getLocalizedText, getEffectiveCoverImage, getProjectSlug, Project } from '../types';
+import { getProjectCategoryDisplayName, getProjectCategoryKey, PROJECT_CATEGORY_OPTIONS } from '../lib/projectCategory';
+import { siteMedia } from '../data/siteMedia';
 
 export default function ProjectsPage() {
   const [activeCategory, setActiveCategory] = useState('All');
   const { t, lang } = useI18n();
   const { projects: sanityProjects, hasData } = useProjects();
+  const { settings: siteSettings } = useSiteSettings();
 
   // Use Sanity data if available, otherwise fallback
   const projects = (hasData && sanityProjects && Array.isArray(sanityProjects)) ? sanityProjects : fallbackProjects;
 
-  // Keep category identity independent from its translated label.
+  // Keep category identity independent from its translated and CMS-editable label.
   const categories = useMemo(() => {
-    const cats = new Map<string, { label: string; imageKey: ReturnType<typeof getProjectHeaderKey> }>();
-    projects.forEach((p: any) => {
-      const category = p.category;
-      const key = typeof category === 'string'
-        ? category
-        : category?._id || category?.slug?.current || getCategoryName(category, 'en');
-      const label = getCategoryName(category, lang) || (typeof category === 'string' ? category : '');
-      const englishName = getCategoryName(category, 'en') || (typeof category === 'string' ? category : label);
-      const imageKey = key in siteMedia.projectHeaders
-        ? key as keyof typeof siteMedia.projectHeaders
-        : getProjectHeaderKey(englishName);
-      if (key && label) cats.set(key, { label, imageKey });
+    const labels = new Map<string, {nameAr?: string; nameEn?: string}>();
+    if (Array.isArray(siteSettings?.projectCategoryLabels)) {
+      siteSettings.projectCategoryLabels.forEach((item: any) => {
+        if (typeof item?.key === 'string') labels.set(item.key, item);
+      });
+    }
+    return PROJECT_CATEGORY_OPTIONS.map((category) => {
+      const configured = labels.get(category.key);
+      const customLabel = lang === 'ar' ? configured?.nameAr : configured?.nameEn;
+      return {
+        key: category.key,
+        label: typeof customLabel === 'string' && customLabel.trim() ? customLabel.trim() : category[lang],
+        imageKey: category.key,
+      };
     });
-    return Array.from(cats, ([key, value]) => ({ key, ...value }));
-  }, [projects, lang]);
+  }, [siteSettings?.projectCategoryLabels, lang]);
 
-  const activeHeaderKey = activeCategory === 'All'
+  const activeHeaderKey = (activeCategory === 'All'
     ? 'all'
-    : categories.find((category) => category.key === activeCategory)?.imageKey || 'all';
+    : categories.find((category) => category.key === activeCategory)?.imageKey || 'all') as keyof typeof siteMedia.projectHeaders;
   const activeHeaderImage = siteMedia.projectHeaders[activeHeaderKey];
 
   const filteredProjects = activeCategory === 'All'
     ? projects
     : projects.filter((p: any) => {
         const category = p.category;
-        const key = typeof category === 'string'
-          ? category
-          : category?._id || category?.slug?.current || getCategoryName(category, 'en');
+        const key = getProjectCategoryKey(category);
         return key === activeCategory;
       });
 
@@ -112,7 +113,7 @@ export default function ProjectsPage() {
       {/* Projects Grid */}
       <section className="py-16 lg:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          {projects.length > 0 ? (
+          {filteredProjects.length > 0 ? (
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeCategory}
@@ -126,7 +127,7 @@ export default function ProjectsPage() {
                   const coverImage = getEffectiveCoverImage(project);
                   const projectSlug = getProjectSlug(project);
                   const title = getLocalizedText(project.title, lang);
-                  const category = getCategoryName(project.category, lang);
+                  const category = getProjectCategoryDisplayName(project.category, lang);
                   const location = getLocalizedText(project.location, lang);
 
                   return (
@@ -190,10 +191,10 @@ export default function ProjectsPage() {
                   <div className="w-6 h-6 bg-bronze/20" />
                 </div>
                 <p className="text-navy/60 text-lg mb-3">
-                  {t('works.empty')}
+                  {activeCategory === 'All' ? t('works.empty') : lang === 'ar' ? 'لا توجد مشاريع منشورة في هذا القسم بعد.' : 'No published projects in this category yet.'}
                 </p>
                 <p className="text-navy/40 text-sm">
-                  {t('works.emptyNote')}
+                  {activeCategory === 'All' ? t('works.emptyNote') : lang === 'ar' ? 'سيظهر هذا القسم بعد نشر مشروع ضمن فئته.' : 'This category will appear after a project in it is published.'}
                 </p>
               </div>
             </AnimatedSection>
