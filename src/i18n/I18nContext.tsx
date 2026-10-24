@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useSiteCopy } from '../hooks';
 
 type Language = 'en' | 'ar';
@@ -343,8 +344,13 @@ const translations: Record<Language, Record<string, string>> = {
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const { data: siteCopy } = useSiteCopy();
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const [lang, setLangState] = useState<Language>(() => {
     if (typeof window !== 'undefined') {
+      const pathname = window.location.pathname;
+      if (pathname === '/ar' || pathname.startsWith('/ar/')) return 'ar';
       const saved = localStorage.getItem('lang') as Language;
       if (saved === 'en' || saved === 'ar') return saved;
     }
@@ -352,16 +358,53 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   });
 
   const setLang = (newLang: Language) => {
+    const currentPath = location.pathname === '/ar'
+      ? '/'
+      : location.pathname.startsWith('/ar/')
+        ? location.pathname.slice(3) || '/'
+        : location.pathname;
+    const targetPath = newLang === 'ar'
+      ? (currentPath === '/' ? '/ar' : `/ar${currentPath}`)
+      : currentPath;
+
     setLangState(newLang);
     localStorage.setItem('lang', newLang);
     document.documentElement.lang = newLang;
     document.documentElement.dir = newLang === 'ar' ? 'rtl' : 'ltr';
+
+    if (targetPath !== location.pathname) {
+      navigate({ pathname: targetPath, search: location.search, hash: location.hash });
+    }
   };
 
   useEffect(() => {
-    document.documentElement.lang = lang;
-    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-  }, [lang]);
+    const isArabicPath = location.pathname === '/ar' || location.pathname.startsWith('/ar/');
+    const saved = localStorage.getItem('lang') as Language;
+
+    if (isArabicPath) {
+      if (lang !== 'ar') setLangState('ar');
+      localStorage.setItem('lang', 'ar');
+      document.documentElement.lang = 'ar';
+      document.documentElement.dir = 'rtl';
+      return;
+    }
+
+    // Keep language preference and URL aligned. This means Arabic content has
+    // crawlable /ar/ URLs while returning visitors can retain their preference.
+    if (saved === 'ar') {
+      const targetPath = location.pathname === '/' ? '/ar' : `/ar${location.pathname}`;
+      setLangState('ar');
+      document.documentElement.lang = 'ar';
+      document.documentElement.dir = 'rtl';
+      navigate({ pathname: targetPath, search: location.search, hash: location.hash }, { replace: true });
+      return;
+    }
+
+    if (lang !== 'en') setLangState('en');
+    localStorage.setItem('lang', 'en');
+    document.documentElement.lang = 'en';
+    document.documentElement.dir = 'ltr';
+  }, [location.pathname, location.search, location.hash, lang, navigate]);
 
   const copyOverrides = useMemo(() => new Map(
     (siteCopy || []).flatMap((section) => section.entries || []).map((entry) => [entry.key, entry] as const),
