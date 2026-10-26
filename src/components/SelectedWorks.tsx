@@ -48,6 +48,7 @@ export default function SelectedWorks() {
               const coverImage = getEffectiveCoverImage(project);
               const projectSlug = getProjectSlug(project);
               const title = getLocalizedText(project.title, lang);
+              const coverImageAlt = getLocalizedText(project.coverImageAlt, lang) || title;
               const category = getCategoryName(project.category, lang);
               const location = getLocalizedText(project.location, lang);
 
@@ -69,7 +70,7 @@ export default function SelectedWorks() {
                         {coverImage ? (
                           <img
                             src={optimizeImageUrl(typeof coverImage === 'string' ? coverImage : urlFor(coverImage).width(800).height(1000).url(), { width: 800, height: 1000, fit: 'crop' })}
-                            alt={title}
+                            alt={coverImageAlt}
                             className="w-full h-full object-cover"
                             loading="lazy"
                             decoding="async"

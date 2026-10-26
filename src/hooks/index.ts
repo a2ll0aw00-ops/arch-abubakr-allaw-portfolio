@@ -7,7 +7,8 @@ const PROJECTS_QUERY = `*[_type == "project" && visible != false] | order(order 
   descriptionEn, descriptionAr, categoryEn, categoryAr, categoryKey, categoryCustomEn, categoryCustomAr,
   "categoryLabels": *[_type == "siteSettings"][0].projectCategoryLabels[key == ^.categoryKey][0] {nameEn, nameAr},
   "coverUrl": coalesce(coverImage.asset->url, coverImageUrl),
-  "uploadedGallery": gallery[]{"url": asset->url}, galleryUrls,
+  "coverAltAr": coverImage.altAr, "coverAltEn": coverImage.altEn,
+  "uploadedGallery": gallery[]{"url": asset->url, altAr, altEn}, galleryUrls,
   locationEn, locationAr, year, area, landDimensions, landArea, client, status, roleEn, roleAr,
   scopeEn, scopeAr, conceptEn, conceptAr, methodologyEn, methodologyAr,
   software, featured, order
@@ -18,7 +19,8 @@ const FEATURED_PROJECTS_QUERY = `*[_type == "project" && visible != false && fea
   descriptionEn, descriptionAr, categoryEn, categoryAr, categoryKey, categoryCustomEn, categoryCustomAr,
   "categoryLabels": *[_type == "siteSettings"][0].projectCategoryLabels[key == ^.categoryKey][0] {nameEn, nameAr},
   "coverUrl": coalesce(coverImage.asset->url, coverImageUrl),
-  "uploadedGallery": gallery[]{"url": asset->url}, galleryUrls,
+  "coverAltAr": coverImage.altAr, "coverAltEn": coverImage.altEn,
+  "uploadedGallery": gallery[]{"url": asset->url, altAr, altEn}, galleryUrls,
   locationEn, locationAr, year, area, landDimensions, landArea, client, status, roleEn, roleAr,
   scopeEn, scopeAr, conceptEn, conceptAr, methodologyEn, methodologyAr,
   software, featured, order
@@ -107,7 +109,8 @@ function useRemote<T>(query: string, initial: T, cache: RequestCache = 'default'
 }
 
 function mapProject(record: any) {
-  const uploadedGallery = Array.isArray(record.uploadedGallery) ? record.uploadedGallery.map((item: any) => item?.url).filter(Boolean) : [];
+  const uploadedGalleryItems = Array.isArray(record.uploadedGallery) ? record.uploadedGallery.filter((item: any) => item?.url) : [];
+  const uploadedGallery = uploadedGalleryItems.map((item: any) => item.url);
   const gallery = uploadedGallery.length > 0
     ? uploadedGallery
     : (Array.isArray(record.galleryUrls) ? record.galleryUrls : []);
@@ -121,7 +124,9 @@ function mapProject(record: any) {
     description: { en: record.descriptionEn || '', ar: record.descriptionAr || '' },
     category,
     coverImage: record.coverUrl || gallery[0],
+    coverImageAlt: {en: record.coverAltEn || '', ar: record.coverAltAr || ''},
     gallery,
+    galleryAlt: uploadedGalleryItems.map((item: any) => ({en: item.altEn || '', ar: item.altAr || ''})),
     location: { en: record.locationEn || '', ar: record.locationAr || '' },
     year: record.year,
     area: record.area,
@@ -155,7 +160,8 @@ export function useProjectBySlug(slug: string) {
     descriptionEn, descriptionAr, categoryEn, categoryAr, categoryKey, categoryCustomEn, categoryCustomAr,
     "categoryLabels": *[_type == "siteSettings"][0].projectCategoryLabels[key == ^.categoryKey][0] {nameEn, nameAr},
     "coverUrl": coalesce(coverImage.asset->url, coverImageUrl),
-    "uploadedGallery": gallery[]{"url": asset->url}, galleryUrls,
+    "coverAltAr": coverImage.altAr, "coverAltEn": coverImage.altEn,
+    "uploadedGallery": gallery[]{"url": asset->url, altAr, altEn}, galleryUrls,
     locationEn, locationAr, year, area, landDimensions, landArea, client, status, roleEn, roleAr,
     scopeEn, scopeAr, conceptEn, conceptAr, methodologyEn, methodologyAr,
     software, featured, order

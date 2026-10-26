@@ -92,6 +92,7 @@ export default function ProjectDetailPage() {
   const designConcept = getLocalizedText(project.designConcept, lang);
   const methodology = getLocalizedText(project.methodology, lang);
   const category = getProjectCategoryDisplayName(project.category, lang);
+  const coverImageAlt = getLocalizedText(project.coverImageAlt, lang) || title;
   const location = getLocalizedText(project.location, lang);
   const role = getLocalizedText(project.role, lang);
   const scope = getLocalizedText(project.scope, lang);
@@ -127,13 +128,13 @@ export default function ProjectDetailPage() {
         {/* Background Image */}
         {coverImageUrl && (
           <>
-            <motion.div
-              aria-hidden="true"
+            <motion.img
+              src={coverImageUrl}
+              alt={coverImageAlt}
               initial={{ scale: 1.1 }}
               animate={{ scale: 1 }}
               transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${coverImageUrl})` }}
+              className="absolute inset-0 h-full w-full object-cover object-center"
             />
             <button
               type="button"
@@ -324,7 +325,7 @@ export default function ProjectDetailPage() {
                       aria-label={lang === 'ar' ? `عرض الصورة ${i + 1} كاملة لمشروع ${title}` : `View full image ${i + 1} for ${title}`}
                       className="absolute inset-0 z-10 h-full w-full cursor-zoom-in focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-bronze"
                     >
-                      <img src={optimizeImageUrl(src, { width: 1280, height: 960, fit: 'crop' })} alt={`${title} ${i + 1}`} className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" decoding="async" />
+                      <img src={optimizeImageUrl(src, { width: 1280, height: 960, fit: 'crop' })} alt={getLocalizedText(project.galleryAlt?.[i], lang) || `${title} ${i + 1}`} className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" decoding="async" />
                       <span aria-hidden="true" className="absolute bottom-4 right-4 rounded-full bg-navy/55 p-2.5 text-white opacity-90 transition-opacity group-hover:opacity-100">
                         <Expand size={17} />
                       </span>

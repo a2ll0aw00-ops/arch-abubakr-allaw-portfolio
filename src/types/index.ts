@@ -63,7 +63,9 @@ export interface Project {
   methodologyEn?: string;
   software?: string[];
   coverImage?: SanityImage | string;
+  coverImageAlt?: MultilingualText;
   gallery?: Array<SanityImage | string>;
+  galleryAlt?: MultilingualText[];
   featured?: boolean;
   order?: number;
 }
