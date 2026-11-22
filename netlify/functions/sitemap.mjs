@@ -73,7 +73,7 @@ export default async function sitemap(request) {
       status: 200,
       headers: {
         'Content-Type': 'application/xml; charset=utf-8',
-        'Cache-Control': 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400',
+        'Cache-Control': 'public, max-age=0, s-maxage=300, stale-while-revalidate=900',
         'X-Content-Type-Options': 'nosniff',
       },
     });
