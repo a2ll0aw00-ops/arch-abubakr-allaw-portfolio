@@ -56,10 +56,49 @@
       html, body { margin: 0; padding: 0; width: 100%; min-height: 100%; }
       body { font-family: 'Montserrat', sans-serif; }
       html[dir="rtl"] body { font-family: 'Noto Kufi Arabic', 'Montserrat', sans-serif; }
+      /* Keep the SEO HTML available to crawlers, but cover it with a branded
+         loading layer while the interactive React app takes over. JavaScript
+         disabled visitors never receive this class and keep the SEO fallback. */
+      html.js-loading::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 2147483646;
+        background: #081728;
+      }
+      html.js-loading::after {
+        content: "";
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        z-index: 2147483647;
+        width: 2.25rem;
+        height: 2.25rem;
+        margin: -1.125rem 0 0 -1.125rem;
+        border: 2px solid rgba(244, 240, 232, 0.28);
+        border-top-color: #C7A66A;
+        border-radius: 50%;
+        animation: initial-load-spin 0.8s linear infinite;
+      }
+      @keyframes initial-load-spin {
+        to { transform: rotate(360deg); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html.js-loading::after { animation: none; }
+      }
       @media print {
         .no-print { display: none !important; }
       }
     </style>
+    <script>
+      // Run before the body is parsed so the SEO fallback is never shown as a
+      // flash to JavaScript-enabled visitors. The timeout preserves a usable
+      // fallback if the app bundle fails to load or crashes.
+      document.documentElement.classList.add('js-loading');
+      window.setTimeout(function () {
+        document.documentElement.classList.remove('js-loading');
+      }, 10000);
+    </script>
   </head>
   <body>
     <div id="root"></div>
