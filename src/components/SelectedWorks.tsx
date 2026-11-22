@@ -2,7 +2,6 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import AnimatedSection from './AnimatedSection';
-import { projects as fallbackProjects } from '../data/content';
 import { useI18n } from '../i18n/I18nContext';
 import { useFeaturedProjects } from '../hooks';
 import { optimizeImageUrl, urlFor } from '../lib/sanity';
@@ -10,12 +9,8 @@ import { getLocalizedText, getCategoryName, getEffectiveCoverImage, getProjectSl
 
 export default function SelectedWorks() {
   const { t, lang } = useI18n();
-  const { projects: sanityProjects, hasData } = useFeaturedProjects();
-  
-  // Use Sanity data if available, otherwise fallback to local data
-  const featuredProjects = (hasData && sanityProjects && Array.isArray(sanityProjects))
-    ? sanityProjects.slice(0, 4)
-    : fallbackProjects.filter(p => p.featured).slice(0, 4);
+  const { projects: sanityProjects, hasData, loading } = useFeaturedProjects();
+  const featuredProjects = hasData && Array.isArray(sanityProjects) ? sanityProjects.slice(0, 4) : [];
 
   return (
     <section className="py-20 lg:py-28 bg-white">
@@ -42,7 +37,11 @@ export default function SelectedWorks() {
         </AnimatedSection>
 
         {/* Projects Grid - 4 Images */}
-        {featuredProjects.length > 0 ? (
+        {loading && !hasData ? (
+          <div aria-hidden="true" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+            {Array.from({length: 4}, (_, index) => <div key={index} className="aspect-[3/4] animate-pulse rounded-sm bg-navy/5" />)}
+          </div>
+        ) : featuredProjects.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
             {featuredProjects.map((project: any, index: number) => {
               const coverImage = getEffectiveCoverImage(project);

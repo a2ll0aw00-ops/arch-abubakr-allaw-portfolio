@@ -10,10 +10,13 @@ type BrandMarkProps = {
 /** Uses the managed logo when available and preserves the existing facade mark as fallback. */
 export default function BrandMark({ className = '', variant = 'dark', priority = false }: BrandMarkProps) {
   const { settings } = useSiteSettings();
-  const lightLogoUrl = settings?.logoLightUrl;
-  const logoUrl = variant === 'light' ? (lightLogoUrl || settings?.logoUrl) : settings?.logoUrl;
+  const bootstrapLogo = typeof document === 'undefined' ? '' : document.querySelector<HTMLMetaElement>('meta[name="site-logo-url"]')?.content || '';
+  const bootstrapLightLogo = typeof document === 'undefined' ? '' : document.querySelector<HTMLMetaElement>('meta[name="site-logo-light-url"]')?.content || '';
+  const lightLogoUrl = settings?.logoLightUrl || bootstrapLightLogo;
+  const logoUrl = variant === 'light' ? (lightLogoUrl || settings?.logoUrl || bootstrapLogo) : (settings?.logoUrl || bootstrapLogo);
   const optimizedLogoUrl = logoUrl ? optimizeImageUrl(logoUrl, { width: 256, height: 256, fit: 'max', quality: 78 }) : undefined;
-  const scale = Math.min(200, Math.max(50, Number(settings?.logoScale) || 100));
+  const bootstrapScale = typeof document === 'undefined' ? 100 : Number(document.querySelector<HTMLMetaElement>('meta[name="site-logo-scale"]')?.content) || 100;
+  const scale = Math.min(200, Math.max(50, Number(settings?.logoScale) || bootstrapScale));
 
   if (optimizedLogoUrl) {
     return (
@@ -27,7 +30,7 @@ export default function BrandMark({ className = '', variant = 'dark', priority =
         style={{
           transform: `scale(${scale / 100})`,
           transformOrigin: 'center',
-          filter: variant === 'light' && !lightLogoUrl ? 'brightness(0) invert(1)' : undefined,
+          filter: variant === 'light' && !(settings?.logoLightUrl || bootstrapLightLogo) ? 'brightness(0) invert(1)' : undefined,
         }}
       />
     );

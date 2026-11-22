@@ -78,7 +78,8 @@ interface RemoteState<T> {
 }
 
 function useRemote<T>(query: string, initial: T, cache: RequestCache = 'default'): RemoteState<T> {
-  const [state, setState] = useState<RemoteState<T>>({
+  const [state, setState] = useState<RemoteState<T> & {requestKey: string}>({
+    requestKey: query,
     data: initial,
     loading: true,
     error: null,
@@ -87,15 +88,17 @@ function useRemote<T>(query: string, initial: T, cache: RequestCache = 'default'
 
   useEffect(() => {
     let active = true;
+    setState({requestKey: query, data: initial, loading: true, error: null, hasData: false});
     sanityQuery<T>(query, {cache})
       .then((data: T) => {
         if (!active) return;
         const hasData = Array.isArray(data) ? data.length > 0 : data !== null && data !== undefined;
-        setState({ data, loading: false, error: null, hasData });
+        setState({requestKey: query, data, loading: false, error: null, hasData});
       })
       .catch((reason: unknown) => {
         if (!active) return;
         setState({
+          requestKey: query,
           data: initial,
           loading: false,
           error: reason instanceof Error ? reason : new Error('Unable to load CMS content'),
@@ -105,7 +108,9 @@ function useRemote<T>(query: string, initial: T, cache: RequestCache = 'default'
     return () => { active = false; };
   }, [query, cache]);
 
-  return state;
+  return state.requestKey === query
+    ? state
+    : {data: initial, loading: true, error: null, hasData: false};
 }
 
 function mapProject(record: any) {
@@ -175,8 +180,28 @@ export function useSiteSettings() {
   return { ...remote, settings: remote.data };
 }
 
+function getBootstrapMeta(name: string): string | null {
+  if (typeof document === 'undefined') return null;
+  const value = document.querySelector<HTMLMetaElement>(`meta[name="${name}"]`)?.content?.trim();
+  return value || null;
+}
+
 export function useHeroSettings() {
-  const remote = useRemote<any | null>(HERO_BACKGROUND_QUERY, null, 'no-store');
+  const backgroundUrl = getBootstrapMeta('site-hero-background-url');
+  const rawFocusX = getBootstrapMeta('site-hero-background-focus-x');
+  const rawFocusY = getBootstrapMeta('site-hero-background-focus-y');
+  const focusX = rawFocusX === null ? Number.NaN : Number(rawFocusX);
+  const focusY = rawFocusY === null ? Number.NaN : Number(rawFocusY);
+  const initial = backgroundUrl ? {
+    heroBackground: {
+      url: backgroundUrl,
+      hotspot: {
+        ...(Number.isFinite(focusX) ? {x: focusX} : {}),
+        ...(Number.isFinite(focusY) ? {y: focusY} : {}),
+      },
+    },
+  } : null;
+  const remote = useRemote<any | null>(HERO_BACKGROUND_QUERY, initial, 'no-store');
   const hero: any = remote.data?.heroBackground?.url
     ? { backgroundImage: remote.data.heroBackground }
     : null;

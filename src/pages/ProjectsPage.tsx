@@ -2,7 +2,6 @@ import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import AnimatedSection from '../components/AnimatedSection';
-import { projects as fallbackProjects } from '../data/content';
 import { useI18n } from '../i18n/I18nContext';
 import { useProjects, useSiteSettings } from '../hooks';
 import { optimizeImageUrl, urlFor } from '../lib/sanity';
@@ -13,11 +12,10 @@ import { siteMedia } from '../data/siteMedia';
 export default function ProjectsPage() {
   const [activeCategory, setActiveCategory] = useState('All');
   const { t, lang } = useI18n();
-  const { projects: sanityProjects, hasData } = useProjects();
+  const { projects: sanityProjects, hasData, loading } = useProjects();
   const { settings: siteSettings } = useSiteSettings();
 
-  // Use Sanity data if available, otherwise fallback
-  const projects = (hasData && sanityProjects && Array.isArray(sanityProjects)) ? sanityProjects : fallbackProjects;
+  const projects = hasData && Array.isArray(sanityProjects) ? sanityProjects : [];
 
   // Keep category identity independent from its translated and CMS-editable label.
   const categories = useMemo(() => {
@@ -113,7 +111,11 @@ export default function ProjectsPage() {
       {/* Projects Grid */}
       <section className="py-16 lg:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          {filteredProjects.length > 0 ? (
+          {loading && !hasData ? (
+            <div aria-hidden="true" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {Array.from({length: 6}, (_, index) => <div key={index} className="aspect-[4/3] animate-pulse rounded-sm bg-navy/5" />)}
+            </div>
+          ) : filteredProjects.length > 0 ? (
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeCategory}

@@ -18,16 +18,21 @@ const iconMap: Record<string, any> = {
 
 export default function AboutPage() {
   const { t, lang } = useI18n();
-  const { settings } = useSiteSettings();
+  const { settings, loading } = useSiteSettings();
   const { services: cmsServices, hasData: hasCmsServices } = useServices();
   const services = hasCmsServices ? cmsServices : fallbackServices;
-  const profileImage = settings?.profileImage?.url || FALLBACK_PROFILE_IMAGE;
+  const bootstrapProfileImage = typeof document === 'undefined' ? '' : document.querySelector<HTMLMetaElement>('meta[name="site-profile-image-url"]')?.content || '';
+  const bootstrapFocusXRaw = typeof document === 'undefined' ? null : document.querySelector<HTMLMetaElement>('meta[name="site-profile-image-focus-x"]')?.content;
+  const bootstrapFocusYRaw = typeof document === 'undefined' ? null : document.querySelector<HTMLMetaElement>('meta[name="site-profile-image-focus-y"]')?.content;
+  const bootstrapFocusX = bootstrapFocusXRaw ? Number(bootstrapFocusXRaw) : undefined;
+  const bootstrapFocusY = bootstrapFocusYRaw ? Number(bootstrapFocusYRaw) : undefined;
+  const profileImage = settings?.profileImage?.url || bootstrapProfileImage || (loading ? '' : FALLBACK_PROFILE_IMAGE);
   const profileImageUrl = optimizeImageUrl(profileImage, {
     width: 900,
     height: 1125,
     fit: 'crop',
-    focusX: settings?.profileImage?.hotspot?.x,
-    focusY: settings?.profileImage?.hotspot?.y,
+    focusX: settings?.profileImage?.hotspot?.x ?? bootstrapFocusX,
+    focusY: settings?.profileImage?.hotspot?.y ?? bootstrapFocusY,
   });
 
   return (
@@ -60,13 +65,15 @@ export default function AboutPage() {
             <AnimatedSection delay={0.1}>
               <div className="relative">
                 <div className="aspect-[4/5] bg-offwhite border border-navy/10 overflow-hidden">
-                  <img
-                    src={profileImageUrl}
-                    alt={lang === 'ar' ? 'صورة تعريفية للمهندس المعماري' : 'Portrait image for the architect profile'}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                    decoding="async"
-                  />
+                  {profileImageUrl ? (
+                    <img
+                      src={profileImageUrl}
+                      alt={lang === 'ar' ? 'صورة تعريفية للمهندس المعماري' : 'Portrait image for the architect profile'}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ) : null}
                 </div>
                 <div className="absolute -bottom-4 -right-4 w-full h-full border-2 border-bronze/30 -z-10" />
               </div>

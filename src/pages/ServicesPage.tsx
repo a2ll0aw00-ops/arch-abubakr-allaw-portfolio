@@ -2,7 +2,6 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Building, Box, Eye, Layout, ExternalLink } from 'lucide-react';
 import AnimatedSection from '../components/AnimatedSection';
-import { services as fallbackServices } from '../data/content';
 import { useI18n } from '../i18n/I18nContext';
 import { useServices } from '../hooks';
 import { optimizeImageUrl } from '../lib/sanity';
@@ -16,8 +15,8 @@ const iconMap: Record<string, any> = {
 
 export default function ServicesPage() {
   const { t, lang } = useI18n();
-  const { services: cmsServices, hasData } = useServices();
-  const services = hasData && cmsServices.length > 0 ? cmsServices : fallbackServices;
+  const { services: cmsServices, hasData, loading } = useServices();
+  const services = hasData && Array.isArray(cmsServices) ? cmsServices : [];
 
   return (
     <>
@@ -34,7 +33,12 @@ export default function ServicesPage() {
       <section className="py-16 lg:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
           <div className="space-y-12">
-            {services.map((service, index) => {
+            {loading && !hasData ? (
+              <div aria-hidden="true" className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="space-y-4"><div className="h-10 w-2/3 animate-pulse bg-navy/5" /><div className="h-24 animate-pulse bg-navy/5" /></div>
+                <div className="aspect-[4/3] animate-pulse bg-navy/5" />
+              </div>
+            ) : services.map((service, index) => {
               const Icon = iconMap[service.icon || 'building'] || Building;
               const title = lang === 'ar' && service.titleAr ? service.titleAr : service.title;
               const description = lang === 'ar' && service.descriptionAr ? service.descriptionAr : service.description;

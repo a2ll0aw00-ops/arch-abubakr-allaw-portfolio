@@ -41,11 +41,15 @@ export default function Layout() {
     const pageLabels = lang === 'ar'
       ? {projects: 'المشاريع', about: 'عن المهندس', services: 'الخدمات', cv: 'السيرة الذاتية', contact: 'تواصل'}
       : {projects: 'Projects', about: 'About', services: 'Services', cv: 'CV', contact: 'Contact'};
-    const routePath = location.pathname.split('?')[0] || '/';
+    const routePath = location.pathname.split('?')[0].replace(/\/+$/, '') || '/';
     const segment = routePath.split('/').filter(Boolean)[0] as keyof typeof pageLabels | undefined;
     const isProjectDetail = /^\/projects\/[^/]+/.test(routePath);
-    const title = !isProjectDetail && segment && pageLabels[segment] ? `${pageLabels[segment]} | ${baseTitle}` : baseTitle;
-    const pageDescription = segment === 'projects'
+    const title = isProjectDetail
+      ? document.title || baseTitle
+      : segment && pageLabels[segment] ? `${pageLabels[segment]} | ${baseTitle}` : baseTitle;
+    const pageDescription = isProjectDetail
+      ? document.querySelector<HTMLMetaElement>('meta[name="description"]')?.content || baseDescription
+      : segment === 'projects'
       ? (lang === 'ar' ? 'معرض مشاريع أبوبكر علاو في التصميم المعماري والتصميم الداخلي والإظهار المعماري.' : 'A portfolio of Abubakr Allaw projects in architectural design, interior design and architectural visualization.')
       : segment === 'services'
         ? (lang === 'ar' ? 'خدمات التصميم المعماري والمخططات والواجهات وRevit وBIM والتصميم الداخلي والإظهار المعماري.' : 'Architectural design, plans and elevations, Revit and BIM, interior design and architectural visualization services.')
@@ -62,16 +66,6 @@ export default function Layout() {
       document.head.appendChild(canonical);
     }
     canonical.href = canonicalUrl;
-    for (const [language, href] of [['en', canonicalUrl], ['ar', canonicalUrl]] as const) {
-      let alternate = document.querySelector(`link[rel="alternate"][hreflang="${language}"]`) as HTMLLinkElement | null;
-      if (!alternate) {
-        alternate = document.createElement('link');
-        alternate.rel = 'alternate';
-        alternate.hreflang = language;
-        document.head.appendChild(alternate);
-      }
-      alternate.href = href;
-    }
     const setMeta = (selector: string, attribute: string, key: string, content: string) => {
       let meta = document.querySelector(selector) as HTMLMetaElement | null;
       if (!meta) {
@@ -85,7 +79,7 @@ export default function Layout() {
     setMeta('meta[property="og:title"]', 'property', 'og:title', title);
     setMeta('meta[property="og:description"]', 'property', 'og:description', pageDescription);
     setMeta('meta[property="og:url"]', 'property', 'og:url', canonicalUrl);
-    setMeta('meta[property="og:type"]', 'property', 'og:type', segment === 'projects' ? 'website' : 'profile');
+    setMeta('meta[property="og:type"]', 'property', 'og:type', isProjectDetail ? 'article' : 'website');
     setMeta('meta[property="og:site_name"]', 'property', 'og:site_name', 'Abubakr Allaw');
     setMeta('meta[name="twitter:card"]', 'name', 'twitter:card', 'summary_large_image');
     setMeta('meta[name="twitter:title"]', 'name', 'twitter:title', title);
@@ -93,7 +87,7 @@ export default function Layout() {
     setMeta('meta[name="twitter:url"]', 'name', 'twitter:url', canonicalUrl);
     const cmsShareImage = settings?.shareImage?.url || settings?.shareImageUrl;
     const shareImage = cmsShareImage || `${siteOrigin}/images/hero.webp`;
-    if (shareImage) {
+    if (shareImage && !isProjectDetail) {
       const imageUrl = optimizeImageUrl(shareImage, {
         width: 1200,
         height: 630,
@@ -128,6 +122,7 @@ export default function Layout() {
     schema.textContent = JSON.stringify({
       '@context': 'https://schema.org',
       '@type': 'Person',
+      '@id': `${siteOrigin}/#person`,
       name: lang === 'ar' ? 'أبوبكر علاو' : 'Abubakr Allaw',
       jobTitle: lang === 'ar' ? 'مهندس معماري ومصمم داخلي' : 'Architectural Engineer & Interior Designer',
       description: pageDescription,

@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, MapPin, Calendar, Maximize, Briefcase, Expand, Ruler } from 'lucide-react';
 import AnimatedSection from '../components/AnimatedSection';
 import ProjectImageLightbox from '../components/ProjectImageLightbox';
-import { projects as fallbackProjects } from '../data/content';
 import { useI18n } from '../i18n/I18nContext';
 import { useProjectBySlug, useProjects } from '../hooks';
 import { optimizeImageUrl, urlFor } from '../lib/sanity';
@@ -19,16 +18,8 @@ export default function ProjectDetailPage() {
   const { project: sanityProject, hasData, loading } = useProjectBySlug(slug || '');
   const { projects: allProjects } = useProjects();
 
-  // Use Sanity data if available, otherwise fallback
-  let project = null;
-  if (hasData && sanityProject) {
-    project = sanityProject;
-  } else if (!loading) {
-    // Try to find in fallback projects
-    project = fallbackProjects.find(p => p.slug?.current === slug) || null;
-  }
-  
-  const projects = (hasData && allProjects && Array.isArray(allProjects) && allProjects.length > 0) ? allProjects : fallbackProjects;
+  const project = hasData && sanityProject ? sanityProject : null;
+  const projects = hasData && Array.isArray(allProjects) ? allProjects : [];
 
   useEffect(() => {
     if (!project) return;
@@ -40,8 +31,50 @@ export default function ProjectDetailPage() {
       ? `${title} — مشروع في ${category || 'التصميم المعماري'} ضمن أعمال أبوبكر علاو.`
       : `${title} — a ${category || 'architectural design'} project by Abubakr Allaw.`);
     document.title = `${title}${suffix}`;
+    document.documentElement.lang = lang;
+    const siteOrigin = 'https://arch-abubakrallaw.netlify.app';
+    const canonicalUrl = `${siteOrigin}/projects/${encodeURIComponent(getProjectSlug(project))}`;
+    let canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.rel = 'canonical';
+      document.head.appendChild(canonical);
+    }
+    canonical.href = canonicalUrl;
     const meta = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
     if (meta) meta.content = pageDescription;
+    let imageUrl = `${siteOrigin}/images/hero.webp`;
+    try {
+      const cover = getEffectiveCoverImage(project);
+      if (cover) {
+        const source = typeof cover === 'string' ? cover : urlFor(cover).url();
+        imageUrl = optimizeImageUrl(source, {width: 1200, height: 630, fit: 'crop', quality: 78});
+      }
+    } catch (error) {
+      console.warn('Failed to update project sharing image:', error);
+    }
+    const setMetaContent = (selector: string, attribute: string, key: string, content: string) => {
+      let item = document.querySelector<HTMLMetaElement>(selector);
+      if (!item) {
+        item = document.createElement('meta');
+        item.setAttribute(attribute, key);
+        document.head.appendChild(item);
+      }
+      item.content = content;
+    };
+    setMetaContent('meta[property="og:type"]', 'property', 'og:type', 'article');
+    setMetaContent('meta[property="og:title"]', 'property', 'og:title', document.title);
+    setMetaContent('meta[property="og:description"]', 'property', 'og:description', pageDescription);
+    setMetaContent('meta[property="og:url"]', 'property', 'og:url', canonicalUrl);
+    setMetaContent('meta[property="og:site_name"]', 'property', 'og:site_name', 'Abubakr Allaw');
+    setMetaContent('meta[property="og:image"]', 'property', 'og:image', imageUrl);
+    setMetaContent('meta[property="og:image:width"]', 'property', 'og:image:width', '1200');
+    setMetaContent('meta[property="og:image:height"]', 'property', 'og:image:height', '630');
+    setMetaContent('meta[name="twitter:card"]', 'name', 'twitter:card', 'summary_large_image');
+    setMetaContent('meta[name="twitter:title"]', 'name', 'twitter:title', document.title);
+    setMetaContent('meta[name="twitter:description"]', 'name', 'twitter:description', pageDescription);
+    setMetaContent('meta[name="twitter:url"]', 'name', 'twitter:url', canonicalUrl);
+    setMetaContent('meta[name="twitter:image"]', 'name', 'twitter:image', imageUrl);
     const schema = document.getElementById('abubakr-project-schema') || document.createElement('script');
     schema.id = 'abubakr-project-schema';
     schema.setAttribute('type', 'application/ld+json');
@@ -50,8 +83,11 @@ export default function ProjectDetailPage() {
       '@type': 'CreativeWork',
       name: title,
       description: pageDescription,
+      url: canonicalUrl,
+      image: imageUrl,
       creator: { '@type': 'Person', name: 'Abubakr Allaw' },
       genre: category || 'Architectural Design',
+      inLanguage: lang,
     });
     if (!schema.parentNode) document.head.appendChild(schema);
   }, [lang, project]);

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
@@ -5,6 +6,22 @@ import { useI18n } from '../i18n/I18nContext';
 
 export default function NotFoundPage() {
   const { t, lang } = useI18n();
+
+  useEffect(() => {
+    let robots = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
+    const created = !robots;
+    if (!robots) {
+      robots = document.createElement('meta');
+      robots.name = 'robots';
+      document.head.appendChild(robots);
+    }
+    const previousContent = robots.content;
+    robots.content = 'noindex, follow';
+    return () => {
+      if (created) robots?.remove();
+      else if (robots) robots.content = previousContent;
+    };
+  }, [lang]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white px-6">
