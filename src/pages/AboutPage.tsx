@@ -68,7 +68,7 @@ export default function AboutPage() {
                   {profileImageUrl ? (
                     <img
                       src={profileImageUrl}
-                      alt={lang === 'ar' ? 'صورة تعريفية للمهندس المعماري' : 'Portrait image for the architect profile'}
+                      alt={lang === 'ar' ? 'صورة تعريفية للمهندس المعماري أبوبكر علاو' : 'Portrait of Architectural Engineer Abubakr Allaw'}
                       className="w-full h-full object-cover"
                       loading="lazy"
                       decoding="async"

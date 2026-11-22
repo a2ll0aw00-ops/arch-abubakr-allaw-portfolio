@@ -219,8 +219,8 @@ async function main() {
   }
   const fullNameEn = settings.fullNameEn || 'Abubakr Allaw';
   const fullNameAr = settings.fullNameAr || 'أبوبكر علاو';
-  const roleEn = settings.roleEn || 'Architectural Engineer & Interior Designer';
-  const roleAr = settings.roleAr || 'مهندس معماري ومصمم داخلي';
+  const roleEn = settings.roleEn || 'Architectural Engineer';
+  const roleAr = settings.roleAr || 'مهندس معماري';
   const siteName = settings.siteName || 'Abubakr Allaw';
   const summary = localized(settings.summaryEn, settings.summaryAr,
     'Architectural design, plans, Revit, BIM and interior design in Ibb, Yemen.');
@@ -228,8 +228,8 @@ async function main() {
   const services = Array.isArray(data.services) ? data.services : [];
   const shareImage = safeUrl(settings.shareImage) || FALLBACK_IMAGE;
   const personId = `${SITE_ORIGIN}/#person`;
-  const titleRoot = settings.seoTitleEn || `${fullNameEn} | ${fullNameAr} — Architect · BIM · Design`;
-  const rootDescription = settings.seoDescriptionEn || `${fullNameEn} (${fullNameAr}), ${roleEn} based in Ibb, Yemen. Architectural design, plans, interiors, Revit and BIM.`;
+  const titleRoot = settings.seoTitleEn || `${fullNameEn} | Architectural Engineer · Revit BIM`;
+  const rootDescription = settings.seoDescriptionEn || `${fullNameEn} is an Architectural Engineer in Ibb, Yemen, specializing in architectural design, plans, interior design, Revit modeling and BIM.`;
   const personSchema = {
     '@type': 'Person', '@id': personId, name: fullNameEn,
     alternateName: [fullNameAr, 'Abubakr Abdullah Allaw'], jobTitle: roleEn,
@@ -255,11 +255,11 @@ async function main() {
   }, globalSchemas);
 
   const staticPages = [
-    {path: '/projects', title: `Projects | ${fullNameEn} — ${fullNameAr}`, description: 'Architectural design, residential plans, Revit BIM and interior design projects by Abubakr Allaw.', body: `${bilingualHeading('Projects', 'المشاريع')}${bilingualParagraph('Explore architectural design, residential plans, Revit BIM documentation and interior design projects.', 'استعرض مشاريع التصميم المعماري والمخططات السكنية وتوثيق Revit وBIM والتصميم الداخلي.')}<ul>${projects.map(projectCard).join('')}</ul>`, image: shareImage, type: 'website'},
-    {path: '/about', title: `About ${fullNameEn} | ${fullNameAr}`, description: `${fullNameEn} (${fullNameAr}) — ${roleEn} based in Ibb, Yemen.`, body: `${bilingualHeading(`About ${fullNameEn}`, `عن ${fullNameAr}`)}${bilingualParagraph(roleEn, roleAr)}${bilingualParagraph(summary.en, summary.ar)}`, image: shareImage, type: 'profile'},
-    {path: '/services', title: `Architectural Services | ${fullNameEn}`, description: 'Architectural design, residential plans, interior design, Revit BIM modeling and documentation services.', body: `${bilingualHeading('Architectural Services', 'الخدمات المعمارية')}<ul>${services.map((service) => `<li><h2>${escapeHtml(service.titleEn || 'Architectural service')} ${service.titleAr ? `— <span lang="ar" dir="rtl">${escapeHtml(service.titleAr)}</span>` : ''}</h2>${bilingualParagraph(service.descriptionEn, service.descriptionAr)}</li>`).join('')}</ul>`, image: shareImage, type: 'website'},
-    {path: '/cv', title: `CV | ${fullNameEn} — ${fullNameAr}`, description: `${roleEn} based in Ibb, Yemen. View the professional profile and CV of ${fullNameEn}.`, body: `${bilingualHeading('Curriculum Vitae', 'السيرة الذاتية')}${bilingualHeading(fullNameEn, fullNameAr)}${bilingualParagraph(roleEn, roleAr)}${bilingualParagraph(summary.en, summary.ar)}<p><a href="/cv">View the full CV · عرض السيرة الذاتية</a></p>`, image: shareImage, type: 'profile'},
-    {path: '/contact', title: `Contact | ${fullNameEn} — ${fullNameAr}`, description: `Contact ${fullNameEn} for architectural design, plans, interior design and Revit BIM services.`, body: `${bilingualHeading('Contact', 'تواصل')}${bilingualParagraph('Discuss an architectural project or collaboration with Abubakr Allaw.', 'تواصل مع أبوبكر علاو لمناقشة مشروع معماري أو فرصة تعاون.')}`, image: shareImage, type: 'website'},
+    {path: '/projects', title: `Architectural Projects | ${fullNameEn}`, description: `Architectural design, residential plans, Revit BIM and interior design projects by ${fullNameEn}.`, body: `${bilingualHeading('Projects', 'المشاريع')}${bilingualParagraph('Explore architectural design, residential plans, Revit BIM documentation and interior design projects.', 'استعرض مشاريع التصميم المعماري والمخططات السكنية وتوثيق Revit وBIM والتصميم الداخلي.')}<ul>${projects.map(projectCard).join('')}</ul>`, image: shareImage, type: 'website'},
+    {path: '/about', title: `About ${fullNameEn} | ${roleEn}`, description: `${fullNameEn} is an ${roleEn} in Ibb, Yemen, working in architectural design, plans, interior design, Revit and BIM.`, body: `${bilingualHeading(`About ${fullNameEn}`, `عن ${fullNameAr}`)}${bilingualParagraph(roleEn, roleAr)}${bilingualParagraph(summary.en, summary.ar)}`, image: shareImage, type: 'profile'},
+    {path: '/services', title: `Architectural Services | ${fullNameEn}`, description: `Architectural design, residential plans, interior design, Revit modeling and BIM documentation services by ${fullNameEn}.`, body: `${bilingualHeading('Architectural Services', 'الخدمات المعمارية')}<ul>${services.map((service) => `<li><h2>${escapeHtml(service.titleEn || 'Architectural service')} ${service.titleAr ? `— <span lang="ar" dir="rtl">${escapeHtml(service.titleAr)}</span>` : ''}</h2>${bilingualParagraph(service.descriptionEn, service.descriptionAr)}</li>`).join('')}</ul>`, image: shareImage, type: 'website'},
+    {path: '/cv', title: `CV | ${fullNameEn} | ${roleEn}`, description: `View the CV of ${fullNameEn}, an ${roleEn} in Ibb, Yemen, with experience in architectural design, Revit, BIM and interior design.`, body: `<p><strong lang="en">Curriculum Vitae</strong> <span aria-hidden="true">·</span> <strong lang="ar" dir="rtl">السيرة الذاتية</strong></p>${bilingualHeading(fullNameEn, fullNameAr)}${bilingualParagraph(roleEn, roleAr)}${bilingualParagraph(summary.en, summary.ar)}<p><a href="/cv">View the full CV · عرض السيرة الذاتية</a></p>`, image: shareImage, type: 'profile'},
+    {path: '/contact', title: `Contact ${fullNameEn} | ${roleEn}`, description: `Contact ${fullNameEn} in Ibb, Yemen to discuss architectural design, plans, interior design, Revit and BIM services.`, body: `${bilingualHeading('Contact', 'تواصل')}${bilingualParagraph(`Discuss an architectural project or collaboration with ${fullNameEn}.`, `تواصل مع ${fullNameAr} لمناقشة مشروع معماري أو فرصة تعاون.`)}`, image: shareImage, type: 'website'},
   ];
   for (const page of staticPages) {
     await writeRoute(baseHtml, page.path, {...page, siteName, schema: {
@@ -301,6 +301,18 @@ async function main() {
   }
 
   await writeNotFoundPage(baseHtml);
+
+  const sitemapEntries = [
+    {route: '/', priority: '1.0'},
+    {route: '/projects', priority: '0.9'},
+    {route: '/about', priority: '0.7'},
+    {route: '/services', priority: '0.8'},
+    {route: '/cv', priority: '0.6'},
+    {route: '/contact', priority: '0.8'},
+    ...projects.map((project) => ({route: `/projects/${encodeURIComponent(project.slug.current)}`})),
+  ];
+  const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapEntries.map(({route, priority}) => `  <url><loc>${escapeHtml(absoluteUrl(route))}</loc>${priority ? `<priority>${priority}</priority>` : ''}</url>`).join('\n')}\n</urlset>\n`;
+  await writeFile(path.join(DIST, 'sitemap.xml'), sitemapXml, 'utf8');
 
   const redirectsPath = path.join(DIST, '_redirects');
   const redirectsText = await readFile(redirectsPath, 'utf8');

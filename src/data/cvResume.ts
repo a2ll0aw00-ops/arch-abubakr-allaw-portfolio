@@ -2,7 +2,7 @@ export type LocalizedText = { ar: string; en: string };
 
 export const cvResume = {
   name: { ar: 'أبوبكر عبد الله محمد علاو', en: 'ABUBAKR ABDULLAH MOHAMMED ALLAW' },
-  role: { ar: 'مهندس معماري', en: 'Architect' },
+  role: { ar: 'مهندس معماري', en: 'Architectural Engineer' },
   descriptor: { ar: 'التصميم المعماري · الرسومات الفنية · Revit وBIM', en: 'Architectural Design · Technical Drawings · Revit & BIM' },
   location: { ar: 'إب، اليمن', en: 'Ibb, Yemen' },
   phone: '+967 774909641',
@@ -16,14 +16,14 @@ export const cvResume = {
       'أطمح إلى توظيف مهاراتي التصميمية والتقنية في تطوير حلول معمارية تجمع بين كفاءة الوظيفة وجودة التكوين ودقة التفاصيل، وتستجيب لاحتياجات العملاء ومتطلبات المشروع.',
     ],
     en: [
-      "Architect with a Bachelor's degree in Architectural Engineering from the University of Ibb and professional experience contributing to architectural project development, with a focus on residential projects, façade design, interior design, and the preparation of plans and technical drawings.",
+      "Architectural Engineer with a Bachelor's degree in Architectural Engineering from the University of Ibb and professional experience contributing to architectural project development, with a focus on residential projects, façade design, interior design, and the preparation of plans and technical drawings.",
       'Experienced in using AutoCAD to prepare and develop architectural drawings, as well as creating 3D models and architectural visualizations with Revit, SketchUp, and Lumion. Contributed to projects for clients in Saudi Arabia, the United Arab Emirates, and Kuwait, with attention to understanding design requirements, reviewing deliverables, and developing them in response to client feedback.',
       'I aim to apply my design and technical skills to develop architectural solutions that combine functional efficiency, quality composition, and precise detailing while responding to client needs and project requirements.',
     ],
   } satisfies Record<'ar' | 'en', string[]>,
   experience: [
     {
-      role: { ar: 'مهندس معماري', en: 'Architect' },
+      role: { ar: 'مهندس معماري', en: 'Architectural Engineer' },
       company: { ar: 'مكتب عمد للاستشارات الهندسية والتطوير العقاري', en: 'Amd Office for Engineering Consultancy and Real Estate Development' },
       meta: { ar: 'إب، اليمن | 2024 – حتى الآن', en: 'Ibb, Yemen | 2024 – Present' },
       responsibilities: [
@@ -36,7 +36,7 @@ export const cvResume = {
       ],
     },
     {
-      role: { ar: 'مهندس معماري | عمل تعاقدي عن بُعد', en: 'Architect | Remote Contract Work' },
+      role: { ar: 'مهندس معماري | عمل تعاقدي عن بُعد', en: 'Architectural Engineer | Remote Contract Work' },
       company: { ar: 'مكتب أوتاد للتصاميم المعمارية', en: 'Awtad Architectural Design Office' },
       meta: { ar: 'تعاون عن بُعد مع المكتب في المملكة العربية السعودية | 2024 – حتى الآن', en: 'Remote collaboration with an office in Saudi Arabia | 2024 – Present' },
       responsibilities: [

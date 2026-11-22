@@ -5,7 +5,7 @@ export const profileData = {
   fullName: 'Abubakr Abdullah Allaw',
   displayName: 'ABUBAKR ALLAW',
   arabicName: 'أبوبكر علاو',
-  title: 'Architectural Engineer & Interior Designer',
+  title: 'Architectural Engineer',
   descriptor: 'Architecture · BIM · Design',
   location: 'Ibb, Yemen',
   phone: '+967 774909641',
@@ -58,7 +58,7 @@ export const educationData = [
 // Work experience - real data only
 export const experienceData = [
   {
-    role: { en: 'Architectural Engineer & Interior Designer', ar: 'مهندس معماري ومصمم داخلي' },
+    role: { en: 'Architectural Engineer', ar: 'مهندس معماري' },
     company: { en: 'Independent Practice', ar: 'ممارسة مستقلة' },
     location: { en: 'Ibb, Yemen', ar: 'إب، اليمن' },
     period: { en: 'Present', ar: 'الحالي' },

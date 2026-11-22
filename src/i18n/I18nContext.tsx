@@ -119,7 +119,7 @@ const translations: Record<Language, Record<string, string>> = {
     // About Page
     'aboutPage.title': 'About',
     'aboutPage.heading': 'Abubakr Allaw',
-    'aboutPage.role': 'Architectural Engineer & Interior Designer',
+    'aboutPage.role': 'Architectural Engineer',
     'aboutPage.whatIDo': 'What I Do',
     'aboutPage.servicesHeading': 'Services',
     'aboutPage.summary': 'An architectural engineer and interior designer based in Ibb, Yemen, dedicated to creating meaningful spaces that balance aesthetics with functionality. With expertise spanning architectural design, building information modeling, and interior design, I bring a comprehensive approach to every project — from initial concept through detailed documentation and visual presentation.',
@@ -282,7 +282,7 @@ const translations: Record<Language, Record<string, string>> = {
     // About Page
     'aboutPage.title': 'عن المهندس',
     'aboutPage.heading': 'أبوبكر علاو',
-    'aboutPage.role': 'مهندس معماري ومصمم داخلي',
+    'aboutPage.role': 'مهندس معماري',
     'aboutPage.whatIDo': 'ما أقدمه',
     'aboutPage.servicesHeading': 'الخدمات',
     'aboutPage.summary': 'مهندس معماري ومصمم داخلي مقيم في إب، اليمن، أكرّس جهودي لإنشاء مساحات ذات معنى توازن بين الجماليات والوظيفية. بخبرة تمتد عبر التصميم المعماري ونمذجة معلومات البناء والتصميم الداخلي، أقدم نهجًا شاملاً لكل مشروع — من الفكرة الأولية مرورًا بالتوثيق التفصيلي والإظهار البصري.',

@@ -32,28 +32,39 @@ export default function Layout() {
 
   useEffect(() => {
     const baseTitle = lang === 'ar'
-      ? settings?.seoTitleAr || settings?.seoTitle || 'أبوبكر علاو | مهندس معماري'
-      : settings?.seoTitleEn || settings?.seoTitle || 'Abubakr Allaw | Architect · BIM · Design';
+      ? settings?.seoTitleAr || settings?.seoTitle || 'أبوبكر علاو | مهندس معماري · Revit وBIM'
+      : settings?.seoTitleEn || settings?.seoTitle || 'Abubakr Allaw | Architectural Engineer · Revit BIM';
     const baseDescription = lang === 'ar'
-      ? settings?.seoDescriptionAr || settings?.seoDescription || 'التصميم المعماري، المخططات والواجهات، التصميم الداخلي، Revit وBIM، والإظهار المعماري.'
-      : settings?.seoDescriptionEn || settings?.seoDescription || 'Architectural design, plans and elevations, interior design, Revit and BIM, and architectural visualization.';
-
-    const pageLabels = lang === 'ar'
-      ? {projects: 'المشاريع', about: 'عن المهندس', services: 'الخدمات', cv: 'السيرة الذاتية', contact: 'تواصل'}
-      : {projects: 'Projects', about: 'About', services: 'Services', cv: 'CV', contact: 'Contact'};
+      ? settings?.seoDescriptionAr || settings?.seoDescription || 'أبوبكر علاو مهندس معماري في إب، اليمن، يقدم خدمات التصميم المعماري والمخططات السكنية والتصميم الداخلي ونمذجة وتوثيق Revit وBIM.'
+      : settings?.seoDescriptionEn || settings?.seoDescription || 'Abubakr Allaw is an Architectural Engineer in Ibb, Yemen, specializing in architectural design, plans, interior design, Revit modeling and BIM.';
     const routePath = location.pathname.split('?')[0].replace(/\/+$/, '') || '/';
-    const segment = routePath.split('/').filter(Boolean)[0] as keyof typeof pageLabels | undefined;
     const isProjectDetail = /^\/projects\/[^/]+/.test(routePath);
+    const fullNameEn = settings?.fullNameEn || 'Abubakr Allaw';
+    const fullNameAr = settings?.fullNameAr || 'أبوبكر علاو';
+    const roleEn = settings?.roleEn || 'Architectural Engineer';
+    const roleAr = settings?.roleAr || 'مهندس معماري';
+    const localizedPageMetadata: Record<string, {title: string; description: string}> = lang === 'ar'
+      ? {
+        '/projects': {title: `المشاريع المعمارية | ${fullNameAr}`, description: `مشاريع ${fullNameAr} في التصميم المعماري والمخططات السكنية والتصميم الداخلي وRevit وBIM.`},
+        '/about': {title: `عن ${fullNameAr} | ${roleAr}`, description: `${fullNameAr} ${roleAr} في إب، اليمن، يعمل في التصميم المعماري والمخططات والتصميم الداخلي وRevit وBIM.`},
+        '/services': {title: `الخدمات المعمارية | ${fullNameAr}`, description: `خدمات ${fullNameAr} تشمل التصميم المعماري والمخططات السكنية والتصميم الداخلي ونمذجة وتوثيق Revit وBIM.`},
+        '/cv': {title: `السيرة الذاتية | ${fullNameAr} | ${roleAr}`, description: `السيرة الذاتية لـ${fullNameAr}، ${roleAr} في إب، اليمن، بخبرة في التصميم المعماري وRevit وBIM والتصميم الداخلي.`},
+        '/contact': {title: `تواصل مع ${fullNameAr} | ${roleAr}`, description: `تواصل مع ${fullNameAr} في إب، اليمن، لمناقشة خدمات التصميم المعماري والمخططات والتصميم الداخلي وRevit وBIM.`},
+      }
+      : {
+        '/projects': {title: `Architectural Projects | ${fullNameEn}`, description: `Architectural design, residential plans, Revit BIM and interior design projects by ${fullNameEn}.`},
+        '/about': {title: `About ${fullNameEn} | ${roleEn}`, description: `${fullNameEn} is an ${roleEn} in Ibb, Yemen, working in architectural design, plans, interior design, Revit and BIM.`},
+        '/services': {title: `Architectural Services | ${fullNameEn}`, description: `Architectural design, residential plans, interior design, Revit modeling and BIM documentation services by ${fullNameEn}.`},
+        '/cv': {title: `CV | ${fullNameEn} | ${roleEn}`, description: `View the CV of ${fullNameEn}, an ${roleEn} in Ibb, Yemen, with experience in architectural design, Revit, BIM and interior design.`},
+        '/contact': {title: `Contact ${fullNameEn} | ${roleEn}`, description: `Contact ${fullNameEn} in Ibb, Yemen to discuss architectural design, plans, interior design, Revit and BIM services.`},
+      };
+    const pageMetadata = localizedPageMetadata[routePath];
     const title = isProjectDetail
       ? document.title || baseTitle
-      : segment && pageLabels[segment] ? `${pageLabels[segment]} | ${baseTitle}` : baseTitle;
+      : pageMetadata?.title || baseTitle;
     const pageDescription = isProjectDetail
       ? document.querySelector<HTMLMetaElement>('meta[name="description"]')?.content || baseDescription
-      : segment === 'projects'
-      ? (lang === 'ar' ? 'معرض مشاريع أبوبكر علاو في التصميم المعماري والتصميم الداخلي والإظهار المعماري.' : 'A portfolio of Abubakr Allaw projects in architectural design, interior design and architectural visualization.')
-      : segment === 'services'
-        ? (lang === 'ar' ? 'خدمات التصميم المعماري والمخططات والواجهات وRevit وBIM والتصميم الداخلي والإظهار المعماري.' : 'Architectural design, plans and elevations, Revit and BIM, interior design and architectural visualization services.')
-        : baseDescription;
+      : pageMetadata?.description || baseDescription;
 
     document.title = title;
     document.documentElement.lang = lang;
@@ -124,7 +135,7 @@ export default function Layout() {
       '@type': 'Person',
       '@id': `${siteOrigin}/#person`,
       name: lang === 'ar' ? 'أبوبكر علاو' : 'Abubakr Allaw',
-      jobTitle: lang === 'ar' ? 'مهندس معماري ومصمم داخلي' : 'Architectural Engineer & Interior Designer',
+      jobTitle: lang === 'ar' ? settings?.roleAr || 'مهندس معماري' : settings?.roleEn || 'Architectural Engineer',
       description: pageDescription,
       knowsAbout: ['Architectural Design', 'Plans and Elevations', 'Revit', 'BIM', 'Interior Design', 'Architectural Visualization'],
       areaServed: 'Yemen',

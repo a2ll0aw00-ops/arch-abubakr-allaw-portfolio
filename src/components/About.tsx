@@ -9,7 +9,7 @@ import BrandMark from './BrandMark';
 export default function About() {
   const { t, lang } = useI18n();
   const { settings } = useSiteSettings();
-  const profileTitle = lang === 'ar' ? settings?.roleAr || 'مهندس معماري ومصمم داخلي' : settings?.roleEn || profileData.title;
+  const profileTitle = lang === 'ar' ? settings?.roleAr || 'مهندس معماري' : settings?.roleEn || profileData.title;
   const profileLocation = lang === 'ar' ? settings?.locationAr || 'إب، اليمن' : settings?.location || profileData.location;
   
   // Use Sanity data if available, otherwise fallback

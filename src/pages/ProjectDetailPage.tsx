@@ -10,6 +10,20 @@ import { optimizeImageUrl, urlFor } from '../lib/sanity';
 import { getLocalizedText, getEffectiveCoverImage, getProjectSlug } from '../types';
 import { getProjectCategoryDisplayName, getProjectLandDetails } from '../lib/projectCategory';
 
+function seoExcerpt(value: string, limit = 155) {
+  const clean = String(value ?? '').replace(/\s+/g, ' ').trim();
+  const chars = Array.from(clean);
+  if (chars.length <= limit) return clean;
+  const prefix = chars.slice(0, limit - 1).join('');
+  const boundary = prefix.lastIndexOf(' ');
+  return `${(boundary > limit * 0.6 ? prefix.slice(0, boundary) : prefix).trim()}…`;
+}
+
+function fitSeoTitle(value: string, suffix: string) {
+  const limit = Math.max(20, 60 - Array.from(suffix).length);
+  return `${seoExcerpt(value, limit)}${suffix}`;
+}
+
 export default function ProjectDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const [activeImageIndex, setActiveImageIndex] = useState<number | null>(null);
@@ -26,11 +40,11 @@ export default function ProjectDetailPage() {
     const title = getLocalizedText(project.title, lang);
     const category = getProjectCategoryDisplayName(project.category, lang);
     const description = getLocalizedText(project.description, lang);
-    const suffix = lang === 'ar' ? ' | أبوبكر علاو | مهندس معماري' : ' | Abubakr Allaw | Architect · BIM · Design';
-    const pageDescription = description || (lang === 'ar'
+    const suffix = lang === 'ar' ? ' | أبوبكر علاو' : ' | Abubakr Allaw';
+    const pageDescription = seoExcerpt(description || (lang === 'ar'
       ? `${title} — مشروع في ${category || 'التصميم المعماري'} ضمن أعمال أبوبكر علاو.`
-      : `${title} — a ${category || 'architectural design'} project by Abubakr Allaw.`);
-    document.title = `${title}${suffix}`;
+      : `${title} — a ${category || 'architectural design'} project by Abubakr Allaw.`));
+    document.title = fitSeoTitle(title, suffix);
     document.documentElement.lang = lang;
     const siteOrigin = 'https://arch-abubakrallaw.netlify.app';
     const canonicalUrl = `${siteOrigin}/projects/${encodeURIComponent(getProjectSlug(project))}`;
