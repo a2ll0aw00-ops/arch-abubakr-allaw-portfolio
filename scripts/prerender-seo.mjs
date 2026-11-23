@@ -153,7 +153,12 @@ function projectCard(project) {
   if (!slug || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return '';
   const title = localized(project.titleEn, project.titleAr, slug);
   const description = localized(project.descriptionEn, project.descriptionAr);
-  return `<li><a href="/projects/${encodeURIComponent(slug)}"><strong>${escapeHtml(title.en)}</strong>${title.ar ? ` — <span lang="ar" dir="rtl">${escapeHtml(title.ar)}</span>` : ''}</a>${bilingualParagraph(description.en, description.ar)}</li>`;
+  const image = safeUrl(project.image);
+  const alt = localized(project.altEn, project.altAr, title.en);
+  const imageMarkup = image
+    ? `<a href="/projects/${encodeURIComponent(slug)}"><img src="${escapeHtml(image)}" alt="${escapeHtml(alt.en)}" loading="lazy" decoding="async" width="1200" style="display:block;max-width:min(100%,30rem);height:auto;margin:0.75rem 0" /></a>`
+    : '';
+  return `<li>${imageMarkup}<a href="/projects/${encodeURIComponent(slug)}"><strong>${escapeHtml(title.en)}</strong>${title.ar ? ` — <span lang="ar" dir="rtl">${escapeHtml(title.ar)}</span>` : ''}</a>${bilingualParagraph(description.en, description.ar)}</li>`;
 }
 
 async function fetchPublishedData() {
